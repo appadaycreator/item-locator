@@ -1,0 +1,28 @@
+# Node.js
+node_modules/
+package-lock.json
+
+# 生成された画像ファイル
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# 一時ファイル
+temp-*.svg
+*.log
+
+# OS生成ファイル
+.DS_Store
+Thumbs.db
+
+# エディタ設定
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 環境設定ファイル
+.env
+.env.local
+.env.*.local 
