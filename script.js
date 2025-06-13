@@ -152,6 +152,45 @@ function handlePhoto(file) {
   reader.readAsDataURL(file);
 }
 
+function exportData() {
+  const data = {
+    items: loadItems(),
+    locations: loadLocations()
+  };
+  const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'item-locator-data.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importData(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (Array.isArray(data.items) && Array.isArray(data.locations)) {
+        localStorage.setItem(ITEM_KEY, JSON.stringify(data.items));
+        localStorage.setItem(LOCATION_KEY, JSON.stringify(data.locations));
+        updateDashboard();
+        updateLocationOptions();
+        renderLocations();
+        if (typeof renderAllItems === 'function') renderAllItems();
+        alert('データをインポートしました');
+      } else {
+        alert('データ形式が不正です');
+      }
+    } catch (err) {
+      alert('データの読み込みに失敗しました');
+    }
+  };
+  reader.readAsText(file);
+}
+
 function saveItem() {
   const name = document.getElementById('itemName').value.trim();
   if (!name) return alert('アイテム名を入力してください');
@@ -380,6 +419,18 @@ window.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       dropArea.classList.remove('border-blue-400');
       if (e.dataTransfer.files[0]) handlePhoto(e.dataTransfer.files[0]);
+    });
+  }
+
+  const exportBtn = document.getElementById('exportDataBtn');
+  if (exportBtn) exportBtn.addEventListener('click', exportData);
+  const importBtn = document.getElementById('importDataBtn');
+  const importInput = document.getElementById('importDataInput');
+  if (importBtn && importInput) {
+    importBtn.addEventListener('click', () => importInput.click());
+    importInput.addEventListener('change', e => {
+      if (e.target.files[0]) importData(e.target.files[0]);
+      importInput.value = '';
     });
   }
 });
