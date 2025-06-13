@@ -55,11 +55,25 @@ function search(query) {
 function handlePhoto(file) {
   const reader = new FileReader();
   reader.onload = e => {
-    photoData = e.target.result;
-    const preview = document.getElementById('photoPreview');
-    if (preview) {
-      preview.innerHTML = `<img src="${photoData}" class="mx-auto mb-2 max-h-40 rounded-lg" alt="preview">`;
-    }
+    const img = new Image();
+    img.onload = () => {
+      const MAX_SIZE = 800;
+      let { width, height } = img;
+      const scale = Math.min(1, MAX_SIZE / Math.max(width, height));
+      width *= scale;
+      height *= scale;
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      photoData = canvas.toDataURL('image/jpeg', 0.8);
+      const preview = document.getElementById('photoPreview');
+      if (preview) {
+        preview.innerHTML = `<img src="${photoData}" class="mx-auto mb-2 max-h-40 rounded-lg" alt="preview">`;
+      }
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
@@ -86,7 +100,12 @@ function saveItem() {
     image,
     createdAt: new Date().toISOString()
   });
-  saveItems(items);
+  try {
+    saveItems(items);
+  } catch (e) {
+    alert('保存に失敗しました。画像サイズを小さくするか写真なしで試してください');
+    return;
+  }
   updateDashboard();
   document.getElementById('itemName').value = '';
   document.getElementById('itemTags').value = '';
