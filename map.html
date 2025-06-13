@@ -15,7 +15,7 @@
         <a href="index.html" class="text-blue-600 hover:underline"><i class="fas fa-arrow-left mr-2"></i>戻る</a>
         <h1 class="text-2xl font-bold mt-2">収納マップ</h1>
     </header>
-    <div id="mapContainer" class="space-y-4"></div>
+    <div id="mapContainer" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
     <script src="script.js"></script>
     <script>
         function renderMap() {
@@ -25,28 +25,39 @@
                 container.innerHTML = '<p class="text-gray-600">まだアイテムが登録されていません。</p>';
                 return;
             }
+
+            const iconMap = {
+                'キッチン': 'fa-utensils',
+                'リビング': 'fa-couch',
+                '寝室': 'fa-bed',
+                '玄関': 'fa-door-closed',
+                'バスルーム': 'fa-bath'
+            };
+
             const map = {};
             items.forEach(item => {
                 if (!map[item.parent]) map[item.parent] = {};
                 if (!map[item.parent][item.detail]) map[item.parent][item.detail] = [];
                 map[item.parent][item.detail].push(item);
             });
+
             for (const [parent, details] of Object.entries(map)) {
                 const parentDiv = document.createElement('div');
-                parentDiv.className = 'bg-white p-4 rounded-lg shadow';
+                parentDiv.className = 'bg-white p-4 rounded-lg shadow flex flex-col gap-2';
                 const parentTitle = document.createElement('div');
-                parentTitle.textContent = parent;
-                parentTitle.className = 'font-bold mb-2';
+                parentTitle.innerHTML = `<i class="fas ${iconMap[parent] || 'fa-box-open'} mr-2"></i>${parent}`;
+                parentTitle.className = 'font-bold text-lg';
                 parentDiv.appendChild(parentTitle);
+
                 for (const [detail, list] of Object.entries(details)) {
                     const detailDiv = document.createElement('div');
-                    detailDiv.className = 'ml-4 mb-2';
+                    detailDiv.className = 'border border-gray-200 rounded p-2';
                     const detailTitle = document.createElement('div');
                     detailTitle.textContent = detail;
-                    detailTitle.className = 'font-medium';
+                    detailTitle.className = 'font-medium mb-1';
                     detailDiv.appendChild(detailTitle);
                     const ul = document.createElement('ul');
-                    ul.className = 'ml-4 list-disc text-gray-700';
+                    ul.className = 'list-disc ml-4 text-gray-700';
                     list.forEach(it => {
                         const li = document.createElement('li');
                         li.textContent = it.name;
