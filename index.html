@@ -3,2367 +3,398 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>どこに置いたっけ？持ち物ロケーター | 探し物ゼロ生活</title>
-    <meta name="description" content="家中の持ち物をスマホで管理。どこに置いたか一瞬で分かる無料の整理整頓アプリ。写真登録・音声入力・AR表示対応。">
-    
-    <!-- OGP設定 -->
-    <meta property="og:title" content="どこに置いたっけ？持ち物ロケーター">
-    <meta property="og:description" content="探し物の時間をゼロに！持ち物の場所を階層管理できる無料アプリ">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://appadaycreator.github.io/item-locator/">
-    <meta property="og:image" content="https://appadaycreator.github.io/item-locator/ogp.png">
-    <meta property="og:site_name" content="どこに置いたっけ？">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@appadaycreator">
-    
-    <!-- PWA設定 -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#4A90E2">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="favicon.png">
-    
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-TXQGZRF9');</script>
-    <!-- End Google Tag Manager -->
-    
+    <title>どこに置いたっけ？持ち物ロケーター</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        
-        :root {
-            --primary: #4A90E2;
-            --primary-dark: #357ABD;
-            --secondary: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --info: #17a2b8;
-            --light: #f8f9fa;
-            --dark: #343a40;
-            --border: #e0e6ed;
-            --shadow: rgba(0,0,0,0.1);
+        .card-hover {
+            transition: all 0.3s ease;
         }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        
-        /* ローディング画面 */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s;
-        }
-        
-        .loading-content {
-            text-align: center;
-            color: white;
-        }
-        
-        .loading-icon {
-            font-size: 4em;
-            animation: bounce 1s infinite;
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        /* ヘッダー */
-        header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 30px 0;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 20px var(--shadow);
-        }
-        
-        header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: float 20s infinite linear;
-        }
-        
-        @keyframes float {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .header-content {
-            position: relative;
-            text-align: center;
-        }
-        
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-        
-        .subtitle {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-        
-        /* ナビゲーションタブ */
-        .nav-tabs {
-            display: flex;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 15px var(--shadow);
-            margin: -20px auto 30px;
-            max-width: 800px;
-            overflow: hidden;
-        }
-        
-        .nav-tab {
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-            background: none;
-            font-size: 16px;
-            position: relative;
-        }
-        
-        .nav-tab:hover {
-            background: var(--light);
-        }
-        
-        .nav-tab.active {
-            color: var(--primary);
-            font-weight: bold;
-        }
-        
-        .nav-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: var(--primary);
-        }
-        
-        /* タブコンテンツ */
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* ダッシュボード */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .dashboard-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 15px var(--shadow);
-            transition: transform 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 25px var(--shadow);
-        }
-        
-        .dashboard-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--warning));
-        }
-        
-        .dashboard-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
-        }
-        
-        .dashboard-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-        
-        .dashboard-label {
-            color: #666;
-            font-size: 0.9em;
-        }
-        
-        .dashboard-trend {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 0.8em;
-            padding: 5px 10px;
-            border-radius: 20px;
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-        
-        /* カード */
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 2px 15px var(--shadow);
-            margin-bottom: 20px;
-        }
-        
-        .card h2 {
-            color: var(--primary);
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        /* フォーム */
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s;
-            background: white;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-        }
-        
-        /* ボタン */
-        .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            margin-right: 10px;
-            margin-bottom: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.5s, height 0.5s;
-        }
-        
-        .btn:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-        
-        .btn:hover {
-            background: var(--primary-dark);
+        .card-hover:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
-        
-        .btn-secondary {
-            background: #6c757d;
+        .custom-shadow {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        
-        .btn-success {
-            background: var(--secondary);
-        }
-        
-        .btn-danger {
-            background: var(--danger);
-        }
-        
-        .btn-warning {
-            background: var(--warning);
-            color: #333;
-        }
-        
-        .btn-info {
-            background: var(--info);
-        }
-        
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-        }
-        
-        .btn-outline:hover {
-            background: var(--primary);
-            color: white;
-        }
-        
-        /* 画像アップロード */
-        .image-upload {
-            border: 3px dashed var(--border);
-            border-radius: 12px;
-            padding: 40px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: var(--light);
-            position: relative;
-        }
-        
-        .image-upload:hover {
-            border-color: var(--primary);
-            background: #e3f2fd;
-        }
-        
-        .image-preview {
-            max-width: 100%;
-            margin-top: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px var(--shadow);
-        }
-        
-        /* 検索バー */
-        .search-bar {
-            position: relative;
-            margin-bottom: 30px;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 15px 50px 15px 20px;
-            font-size: 18px;
-            border-radius: 30px;
-            border: 2px solid var(--border);
-            transition: all 0.3s;
-        }
-        
-        .search-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(74, 144, 226, 0.1);
-        }
-        
-        .search-btn {
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--primary);
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            color: white;
-            transition: all 0.3s;
-        }
-        
-        .search-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-50%) scale(1.1);
-        }
-        
-        /* フィルター */
-        .filter-chips {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-        
-        .chip {
-            padding: 8px 16px;
-            border-radius: 20px;
-            background: var(--light);
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-        
-        .chip:hover {
-            border-color: var(--primary);
-        }
-        
-        .chip.active {
-            background: var(--primary);
-            color: white;
-        }
-        
-        /* アイテムカード */
-        .items-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        
-        .item-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 15px var(--shadow);
-            transition: all 0.3s;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .item-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 25px var(--shadow);
-        }
-        
-        .item-card.favorite::before {
-            content: '⭐';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 20px;
-        }
-        
-        .item-image {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .item-name {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-        
-        .item-location {
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-        }
-        
-        .item-tags {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-        
-        .tag {
-            padding: 3px 10px;
-            background: #e3f2fd;
-            color: var(--primary);
-            border-radius: 15px;
-            font-size: 12px;
-        }
-        
-        /* ツリービュー */
-        .tree-view {
-            margin-top: 20px;
-        }
-        
-        .tree-item {
-            padding: 12px;
-            margin: 5px 0;
-            background: var(--light);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-left: 4px solid transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .tree-item:hover {
-            background: #e9ecef;
-            border-left-color: var(--primary);
-            transform: translateX(5px);
-        }
-        
-        .tree-item.selected {
-            background: #e3f2fd;
-            border-left-color: var(--primary);
-        }
-        
-        .tree-icon {
-            font-size: 1.2em;
-            transition: transform 0.3s;
-        }
-        
-        .tree-item.expanded .tree-icon {
-            transform: rotate(90deg);
-        }
-        
-        .tree-children {
-            margin-left: 30px;
-            margin-top: 5px;
-            display: none;
-        }
-        
-        .tree-children.show {
-            display: block;
-        }
-        
-        .tree-count {
-            margin-left: auto;
-            background: var(--primary);
-            color: white;
-            padding: 2px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-        }
-        
-        /* 検索結果 */
-        .search-results {
-            margin-top: 20px;
-        }
-        
-        .search-result {
-            padding: 20px;
-            background: #fffbf0;
-            border: 2px solid #ffd700;
-            border-radius: 12px;
-            margin: 10px 0;
-            animation: highlight 0.5s ease;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .search-result:hover {
-            transform: translateX(10px);
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
-        }
-        
-        @keyframes highlight {
-            0% { transform: scale(0.95); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        /* 統計チャート */
-        .chart-container {
-            height: 300px;
-            margin: 20px 0;
-            position: relative;
-        }
-        
-        /* アクティビティフィード */
-        .activity-feed {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .activity-item {
-            padding: 15px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: background 0.3s;
-        }
-        
-        .activity-item:hover {
-            background: var(--light);
-        }
-        
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .activity-time {
-            color: #999;
-            font-size: 0.8em;
-        }
-        
-        /* モーダル */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            animation: fadeIn 0.3s;
-        }
-        
-        .modal-content {
-            position: relative;
-            background: white;
-            width: 90%;
-            max-width: 700px;
-            margin: 50px auto;
-            padding: 30px;
-            border-radius: 12px;
-            max-height: 80vh;
-            overflow-y: auto;
-            animation: slideIn 0.3s;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 30px;
-            cursor: pointer;
-            color: #999;
-            transition: color 0.3s;
-        }
-        
-        .close:hover {
-            color: #333;
-            transform: rotate(90deg);
-        }
-        
-        /* 実績バッジ */
-        .achievements {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .achievement {
-            text-align: center;
-            padding: 20px;
-            background: var(--light);
-            border-radius: 12px;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        
-        .achievement.unlocked {
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
-            color: #333;
-        }
-        
-        .achievement:hover {
-            transform: scale(1.05);
-        }
-        
-        .achievement-icon {
-            font-size: 3em;
-            margin-bottom: 10px;
-        }
-        
-        .achievement-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .achievement-desc {
-            font-size: 0.8em;
-            color: #666;
-        }
-        
-        /* プログレスバー */
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background: var(--light);
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transition: width 0.5s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        /* アフィリエイトセクション */
-        .affiliate-section {
-            margin-top: 40px;
-            padding: 30px;
-            background: linear-gradient(135deg, #f0f8ff, #e6f3ff);
-            border-radius: 12px;
-            border: 2px dashed var(--primary);
-        }
-        
-        .affiliate-section h3 {
-            color: var(--primary);
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-        
-        .affiliate-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 25px;
-        }
-        
-        .affiliate-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            transition: all 0.3s;
-            cursor: pointer;
-            box-shadow: 0 2px 10px var(--shadow);
-        }
-        
-        .affiliate-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px var(--shadow);
-        }
-        
-        .affiliate-card img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .affiliate-card h4 {
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
-        
-        .affiliate-price {
-            font-size: 1.5em;
-            color: var(--danger);
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        /* フッター */
-        .footer {
-            background: #2c3e50;
-            color: white;
-            padding: 40px 0;
-            margin-top: 60px;
-        }
-        
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        .footer-section h4 {
-            margin-bottom: 15px;
-        }
-        
-        .footer-links {
-            list-style: none;
-        }
-        
-        .footer-links a {
-            color: #bdc3c7;
-            text-decoration: none;
-            display: block;
-            padding: 5px 0;
-            transition: color 0.3s;
-        }
-        
-        .footer-links a:hover {
-            color: white;
-            padding-left: 10px;
-        }
-        
-        /* レスポンシブ */
-        @media (max-width: 768px) {
-            .nav-tabs {
-                flex-direction: column;
-            }
-            
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .items-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            h1 {
-                font-size: 1.8em;
-            }
-            
-            .modal-content {
-                margin: 20px;
-                padding: 20px;
-            }
-        }
-        
-        /* アニメーション */
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .shake {
-            animation: shake 0.5s;
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-        
-        /* スケルトンローダー */
-        .skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-        
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-        
-        /* 音声認識インジケーター */
-        .voice-indicator {
-            position: fixed;
-            bottom: 100px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background: var(--danger);
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            box-shadow: 0 4px 20px rgba(220, 53, 69, 0.4);
-            animation: pulse 1s infinite;
-            cursor: pointer;
-        }
-        
-        .voice-indicator.active {
-            display: flex;
-        }
-        
-        /* フローティングアクションボタン */
-        .fab {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            box-shadow: 0 4px 20px var(--shadow);
-            cursor: pointer;
-            transition: all 0.3s;
-            z-index: 100;
-        }
-        
-        .fab:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 30px var(--shadow);
-        }
-        
-        .fab-menu {
-            position: absolute;
-            bottom: 70px;
-            right: 0;
-            display: none;
-        }
-        
-        .fab-menu.show {
-            display: block;
-        }
-        
-        .fab-option {
-            width: 50px;
-            height: 50px;
-            background: white;
-            border-radius: 50%;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 10px var(--shadow);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .fab-option:hover {
-            transform: scale(1.1);
-        }
-        
-        /* チュートリアル */
-        .tutorial-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 2000;
-            display: none;
-        }
-        
-        .tutorial-spotlight {
-            position: absolute;
-            border: 3px solid #ffd700;
-            border-radius: 8px;
-            box-shadow: 0 0 0 9999px rgba(0,0,0,0.8);
-            animation: pulse 2s infinite;
-        }
-        
-        .tutorial-tooltip {
-            position: absolute;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
-            max-width: 300px;
-            z-index: 2001;
-        }
-        
-        .tutorial-tooltip h3 {
-            margin-bottom: 10px;
-            color: var(--primary);
-        }
-        
-        .tutorial-buttons {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-        }
-        
-        /* カスタムアラート */
-        .custom-alert {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
-            display: none;
-            z-index: 3000;
-            animation: slideInRight 0.3s;
-        }
-        
-        @keyframes slideInRight {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
-        
-        .alert-success {
-            border-left: 5px solid var(--success);
-        }
-        
-        .alert-error {
-            border-left: 5px solid var(--danger);
-        }
-        
-        .alert-info {
-            border-left: 5px solid var(--info);
+        @media print {
+            body { font-size: 12px; }
+            .no-print { display: none; }
         }
     </style>
 </head>
-<body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TXQGZRF9"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-    
-    <!-- ローディング画面 -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-content">
-            <div class="loading-icon">📦</div>
-            <h2>どこに置いたっけ？</h2>
-            <p>準備中...</p>
-        </div>
-    </div>
-    
-    <header>
-        <div class="header-content">
-            <h1>📦 どこに置いたっけ？持ち物ロケーター</h1>
-            <p class="subtitle">探し物の時間をゼロに！AIで賢く管理</p>
+<body class="bg-gray-50 font-sans">
+    <!-- ヘッダー -->
+    <header class="gradient-bg text-white p-6 custom-shadow">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-map-marker-alt text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">どこに置いたっけ？</h1>
+                        <p class="text-blue-100">持ち物ロケーター</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-blue-100">探し物の時間をゼロに！</p>
+                    <p class="text-sm">AIで賢く管理</p>
+                </div>
+            </div>
         </div>
     </header>
-    
-    <!-- ナビゲーションタブ -->
-    <div class="container">
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="switchTab('dashboard')">
-                🏠 ダッシュボード
-            </button>
-            <button class="nav-tab" onclick="switchTab('search')">
-                🔍 検索
-            </button>
-            <button class="nav-tab" onclick="switchTab('add')">
-                ➕ 登録
-            </button>
-            <button class="nav-tab" onclick="switchTab('map')">
-                🗺️ マップ
-            </button>
-            <button class="nav-tab" onclick="switchTab('analytics')">
-                📊 分析
-            </button>
-        </div>
-        
-        <!-- ダッシュボードタブ -->
-        <div id="dashboard" class="tab-content active">
-            <div class="dashboard-grid">
-                <div class="dashboard-card">
-                    <div class="dashboard-icon">📦</div>
-                    <div class="dashboard-number" id="totalItems">0</div>
-                    <div class="dashboard-label">登録アイテム</div>
-                    <div class="dashboard-trend">+12% 今週</div>
-                </div>
-                <div class="dashboard-card">
-                    <div class="dashboard-icon">📍</div>
-                    <div class="dashboard-number" id="totalLocations">0</div>
-                    <div class="dashboard-label">収納場所</div>
-                </div>
-                <div class="dashboard-card">
-                    <div class="dashboard-icon">⏱️</div>
-                    <div class="dashboard-number" id="savedTime">0</div>
-                    <div class="dashboard-label">節約時間(分)</div>
-                </div>
-                <div class="dashboard-card">
-                    <div class="dashboard-icon">🏆</div>
-                    <div class="dashboard-number" id="achievementCount">0</div>
-                    <div class="dashboard-label">獲得実績</div>
+
+    <div class="max-w-6xl mx-auto p-6">
+        <!-- ダッシュボード統計 -->
+        <div class="grid md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-6 rounded-lg custom-shadow card-hover">
+                <div class="flex items-center">
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-box text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-600 text-sm">登録アイテム</p>
+                        <p class="text-2xl font-bold text-gray-800">127</p>
+                        <p class="text-green-500 text-xs">+12% 今週</p>
+                    </div>
                 </div>
             </div>
             
-            <div class="card">
-                <h2>🎯 今日のミッション</h2>
-                <div class="missions">
-                    <div class="mission-item">
-                        <input type="checkbox" id="mission1">
-                        <label for="mission1">5個以上のアイテムを登録する</label>
-                        <span class="mission-reward">+50XP</span>
+            <div class="bg-white p-6 rounded-lg custom-shadow card-hover">
+                <div class="flex items-center">
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-home text-green-600 text-xl"></i>
                     </div>
-                    <div class="mission-item">
-                        <input type="checkbox" id="mission2">
-                        <label for="mission2">写真付きでアイテムを登録する</label>
-                        <span class="mission-reward">+30XP</span>
+                    <div class="ml-4">
+                        <p class="text-gray-600 text-sm">収納場所</p>
+                        <p class="text-2xl font-bold text-gray-800">15</p>
                     </div>
-                    <div class="mission-item">
-                        <input type="checkbox" id="mission3">
-                        <label for="mission3">QRコードを1つ印刷する</label>
-                        <span class="mission-reward">+20XP</span>
-                    </div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="missionProgress" style="width: 0%">0%</div>
                 </div>
             </div>
             
-            <div class="card">
-                <h2>📈 最近のアクティビティ</h2>
-                <div class="activity-feed" id="activityFeed">
-                    <!-- アクティビティがここに表示されます -->
-                </div>
-            </div>
-        </div>
-        
-        <!-- 検索タブ -->
-        <div id="search" class="tab-content">
-            <div class="card">
-                <h2>🔍 スマート検索</h2>
-                <div class="search-bar">
-                    <input type="text" class="search-input" id="searchInput" placeholder="アイテム名、場所、タグで検索...">
-                    <button class="search-btn" onclick="performSearch()">🔍</button>
-                </div>
-                
-                <div class="filter-chips">
-                    <div class="chip" onclick="toggleFilter(this, 'recent')">最近追加</div>
-                    <div class="chip" onclick="toggleFilter(this, 'favorite')">お気に入り</div>
-                    <div class="chip" onclick="toggleFilter(this, 'photo')">写真あり</div>
-                    <div class="chip" onclick="toggleFilter(this, 'frequent')">よく使う</div>
-                </div>
-                
-                <div class="search-results" id="searchResults">
-                    <!-- 検索結果がここに表示されます -->
+            <div class="bg-white p-6 rounded-lg custom-shadow card-hover">
+                <div class="flex items-center">
+                    <div class="bg-purple-100 p-3 rounded-full">
+                        <i class="fas fa-clock text-purple-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-600 text-sm">節約時間(分)</p>
+                        <p class="text-2xl font-bold text-gray-800">342</p>
+                    </div>
                 </div>
             </div>
             
-            <div class="card">
-                <h2>🎤 音声検索</h2>
-                <button class="btn btn-info" onclick="startVoiceSearch()">
-                    🎤 音声で検索
-                </button>
-                <p class="voice-status" id="voiceStatus"></p>
+            <div class="bg-white p-6 rounded-lg custom-shadow card-hover">
+                <div class="flex items-center">
+                    <div class="bg-orange-100 p-3 rounded-full">
+                        <i class="fas fa-search text-orange-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-600 text-sm">今月の検索</p>
+                        <p class="text-2xl font-bold text-gray-800">89</p>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <!-- 登録タブ -->
-        <div id="add" class="tab-content">
-            <div class="card">
-                <h2>➕ 新規アイテム登録</h2>
-                
-                <div class="form-group">
-                    <label>📷 写真</label>
-                    <div class="image-upload" onclick="document.getElementById('imageInput').click()">
-                        <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="previewImage(event)">
-                        <div id="imagePreviewContainer">
-                            <p>クリックまたはドラッグ＆ドロップで画像を追加</p>
-                            <p style="font-size: 0.8em; color: #666;">写真があると探しやすくなります！</p>
+
+        <!-- メイン機能エリア -->
+        <div class="grid lg:grid-cols-3 gap-6 mb-8">
+            <!-- 検索エリア -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- スマート検索 -->
+                <div class="bg-white p-6 rounded-lg custom-shadow">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-search mr-2 text-blue-600"></i>
+                        スマート検索
+                    </h2>
+                    <div class="relative">
+                        <input type="text" placeholder="アイテム名、場所、タグで検索..." 
+                               class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <button class="absolute right-3 top-3 bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- クイック検索ボタン -->
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <button class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition">
+                            最近追加
+                        </button>
+                        <button class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition">
+                            お気に入り
+                        </button>
+                        <button class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition">
+                            写真あり
+                        </button>
+                        <button class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition">
+                            よく使う
+                        </button>
+                        <button class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm hover:bg-blue-200 transition">
+                            <i class="fas fa-microphone mr-1"></i> 音声検索
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 最近のアクティビティ -->
+                <div class="bg-white p-6 rounded-lg custom-shadow">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-history mr-2 text-green-600"></i>
+                        最近のアクティビティ
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-plus-circle text-green-500 mr-3"></i>
+                                <span class="text-gray-700">「MacBookの充電器」を寝室に登録</span>
+                            </div>
+                            <span class="text-gray-400 text-sm">2分前</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-search text-blue-500 mr-3"></i>
+                                <span class="text-gray-700">「ハサミ」を検索</span>
+                            </div>
+                            <span class="text-gray-400 text-sm">15分前</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-edit text-orange-500 mr-3"></i>
+                                <span class="text-gray-700">「印鑑」の場所を更新</span>
+                            </div>
+                            <span class="text-gray-400 text-sm">1時間前</span>
                         </div>
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <label>🏠 収納場所（大分類）</label>
-                    <select id="parentLocation">
-                        <option value="">新規作成</option>
-                    </select>
-                    <input type="text" id="newParentLocation" placeholder="例：リビング、寝室、キッチン" style="margin-top: 10px; display: none;">
-                </div>
-                
-                <div class="form-group">
-                    <label>📍 詳細場所</label>
-                    <input type="text" id="detailLocation" placeholder="例：テレビ台の引き出し、2段目左側">
-                </div>
-                
-                <div class="form-group">
-                    <label>📦 アイテム名 <span style="color: red;">*</span></label>
-                    <input type="text" id="itemName" placeholder="例：Nintendo Switch、取扱説明書" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>🏷️ タグ（スペース区切り）</label>
-                    <input type="text" id="itemTags" placeholder="例：ゲーム 電子機器 趣味">
-                </div>
-                
-                <div class="form-group">
-                    <label>📝 メモ</label>
-                    <textarea id="itemMemo" rows="3" placeholder="例：2023年購入、保証書は別保管"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>⭐ お気に入り</label>
-                    <input type="checkbox" id="itemFavorite" style="width: auto;">
-                </div>
-                
-                <button class="btn btn-success" onclick="addItem()">
-                    ✅ 登録する
-                </button>
-                <button class="btn btn-secondary" onclick="addItemAndContinue()">
-                    ➕ 登録して続ける
-                </button>
-                <button class="btn btn-warning" onclick="startVoiceInput()">
-                    🎤 音声入力
-                </button>
             </div>
-            
-            <div class="card">
-                <h2>📸 バーコード/QRコードスキャン</h2>
-                <button class="btn btn-info" onclick="startBarcodeScanner()">
-                    📸 カメラでスキャン
-                </button>
-                <div id="barcodeResult"></div>
-            </div>
-        </div>
-        
-        <!-- マップタブ -->
-        <div id="map" class="tab-content">
-            <div class="card">
-                <h2>🗺️ 収納マップ</h2>
-                <div class="view-options">
-                    <button class="btn btn-outline" onclick="changeView('tree')">🌳 ツリー表示</button>
-                    <button class="btn btn-outline" onclick="changeView('grid')">⚡ グリッド表示</button>
-                    <button class="btn btn-outline" onclick="changeView('3d')">🎮 3D表示</button>
-                </div>
-                <div id="mapView" class="tree-view">
-                    <!-- マップビューがここに表示されます -->
-                </div>
-            </div>
-            
-            <div class="card">
-                <h2>🏷️ QRコード管理</h2>
-                <button class="btn btn-primary" onclick="generateBatchQR()">
-                    📑 一括QR生成
-                </button>
-                <button class="btn btn-secondary" onclick="printQRLabels()">
-                    🖨️ ラベル印刷
-                </button>
-                <div id="qrManagement"></div>
-            </div>
-        </div>
-        
-        <!-- 分析タブ -->
-        <div id="analytics" class="tab-content">
-            <div class="card">
-                <h2>📊 利用統計</h2>
-                <div class="chart-container">
-                    <canvas id="usageChart"></canvas>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h2>🏆 実績とランキング</h2>
-                <div class="achievements" id="achievements">
-                    <div class="achievement unlocked">
-                        <div class="achievement-icon">🎯</div>
-                        <div class="achievement-name">初めての登録</div>
-                        <div class="achievement-desc">最初のアイテムを登録</div>
-                    </div>
-                    <div class="achievement">
-                        <div class="achievement-icon">📦</div>
-                        <div class="achievement-name">収納マスター</div>
-                        <div class="achievement-desc">100個のアイテムを登録</div>
-                    </div>
-                    <div class="achievement">
-                        <div class="achievement-icon">🔍</div>
-                        <div class="achievement-name">検索の達人</div>
-                        <div class="achievement-desc">50回検索を実行</div>
-                    </div>
-                    <div class="achievement">
-                        <div class="achievement-icon">📸</div>
-                        <div class="achievement-name">写真コレクター</div>
-                        <div class="achievement-desc">30個の写真付きアイテム</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h2>🥇 ランキング</h2>
-                <div class="ranking-list">
-                    <div class="ranking-item">
-                        <span class="rank">1</span>
-                        <span class="rank-name">あなた</span>
-                        <span class="rank-score">1,250 XP</span>
-                    </div>
-                    <div class="ranking-item">
-                        <span class="rank">2</span>
-                        <span class="rank-name">平均的なユーザー</span>
-                        <span class="rank-score">850 XP</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- アフィリエイトセクション -->
-        <div class="affiliate-section">
-            <h3>🛍️ おすすめ収納グッズ</h3>
-            <p>プロが選ぶ！整理整頓が10倍はかどる人気アイテム</p>
-            <div class="affiliate-grid">
-                <div class="affiliate-card" onclick="trackAffiliate('muji-box')">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='150' viewBox='0 0 250 150'%3E%3Crect width='250' height='150' fill='%23f5f5f5'/%3E%3Ctext x='125' y='75' text-anchor='middle' font-family='Arial' font-size='16' fill='%23999'%3E無印良品%3C/text%3E%3C/svg%3E" alt="無印良品収納ボックス">
-                    <h4>無印良品 収納ボックス</h4>
-                    <p>シンプルで使いやすい定番商品</p>
-                    <div class="affiliate-price">¥990〜</div>
-                    <button class="btn">詳細を見る</button>
-                </div>
-                <div class="affiliate-card" onclick="trackAffiliate('ikea-shelf')">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='150' viewBox='0 0 250 150'%3E%3Crect width='250' height='150' fill='%23003399'/%3E%3Ctext x='125' y='75' text-anchor='middle' font-family='Arial' font-size='20' fill='%23ffcc00' font-weight='bold'%3EIKEA%3C/text%3E%3C/svg%3E" alt="IKEA収納家具">
-                    <h4>IKEA カラックス</h4>
-                    <p>自由にカスタマイズできる収納棚</p>
-                    <div class="affiliate-price">¥4,990〜</div>
-                    <button class="btn">詳細を見る</button>
-                </div>
-                <div class="affiliate-card" onclick="trackAffiliate('label-maker')">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='150' viewBox='0 0 250 150'%3E%3Crect width='250' height='150' fill='%23e0e0e0'/%3E%3Ctext x='125' y='75' text-anchor='middle' font-family='Arial' font-size='14' fill='%23666'%3Eラベルプリンター%3C/text%3E%3C/svg%3E" alt="ラベルプリンター">
-                    <h4>ブラザー P-touch</h4>
-                    <p>見やすいラベルで整理整頓</p>
-                    <div class="affiliate-price">¥3,980</div>
-                    <button class="btn">詳細を見る</button>
-                </div>
-                <div class="affiliate-card" onclick="trackAffiliate('storage-book')">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='150' viewBox='0 0 250 150'%3E%3Crect width='250' height='150' fill='%23fff3e0'/%3E%3Ctext x='125' y='75' text-anchor='middle' font-family='Arial' font-size='16' fill='%23ff6f00'%3E収納術の本%3C/text%3E%3C/svg%3E" alt="収納術の本">
-                    <h4>人生がときめく片づけの魔法</h4>
-                    <p>こんまり流で人生が変わる</p>
-                    <div class="affiliate-price">¥1,540</div>
-                    <button class="btn">詳細を見る</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- フッター -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4>サービスについて</h4>
-                <ul class="footer-links">
-                    <li><a href="#" onclick="showAbout()">このサービスについて</a></li>
-                    <li><a href="#" onclick="showTutorial()">使い方ガイド</a></li>
-                    <li><a href="#" onclick="showFAQ()">よくある質問</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>法的情報</h4>
-                <ul class="footer-links">
-                    <li><a href="#" onclick="showPrivacyPolicy()">プライバシーポリシー</a></li>
-                    <li><a href="#" onclick="showTerms()">利用規約</a></li>
-                    <li><a href="#" onclick="showDisclaimer()">免責事項</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>サポート</h4>
-                <ul class="footer-links">
-                    <li><a href="#" onclick="showContact()">お問い合わせ</a></li>
-                    <li><a href="#" onclick="reportBug()">不具合報告</a></li>
-                    <li><a href="#" onclick="requestFeature()">機能リクエスト</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>フォローする</h4>
-                <ul class="footer-links">
-                    <li><a href="https://twitter.com/appadaycreator" target="_blank">Twitter</a></li>
-                    <li><a href="#" onclick="shareService()">このサービスをシェア</a></li>
-                </ul>
-            </div>
-        </div>
-    </footer>
-    
-    <!-- フローティングアクションボタン -->
-    <div class="fab" onclick="toggleFABMenu()">
-        <span id="fabIcon">➕</span>
-        <div class="fab-menu" id="fabMenu">
-            <div class="fab-option" onclick="quickAdd()">📦</div>
-            <div class="fab-option" onclick="quickSearch()">🔍</div>
-            <div class="fab-option" onclick="quickQR()">📱</div>
-        </div>
-    </div>
-    
-    <!-- 音声認識インジケーター -->
-    <div class="voice-indicator" id="voiceIndicator" onclick="stopVoiceRecognition()">
-        🎤
-    </div>
-    
-    <!-- カスタムアラート -->
-    <div class="custom-alert" id="customAlert"></div>
-    
-    <!-- チュートリアルオーバーレイ -->
-    <div class="tutorial-overlay" id="tutorialOverlay">
-        <div class="tutorial-spotlight" id="tutorialSpotlight"></div>
-        <div class="tutorial-tooltip" id="tutorialTooltip">
-            <h3 id="tutorialTitle"></h3>
-            <p id="tutorialText"></p>
-            <div class="tutorial-buttons">
-                <button class="btn btn-secondary" onclick="skipTutorial()">スキップ</button>
-                <button class="btn btn-primary" onclick="nextTutorialStep()">次へ</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- モーダル群 -->
-    <!-- アイテム詳細モーダル -->
-    <div id="itemDetailModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('itemDetailModal')">&times;</span>
-            <h2 id="modalItemName"></h2>
-            <img id="modalItemImage" style="width: 100%; max-height: 300px; object-fit: contain; margin: 20px 0;">
-            <p><strong>場所：</strong> <span id="modalItemLocation"></span></p>
-            <p><strong>タグ：</strong> <span id="modalItemTags"></span></p>
-            <p><strong>メモ：</strong> <span id="modalItemMemo"></span></p>
-            <p><strong>登録日：</strong> <span id="modalItemDate"></span></p>
-            <p><strong>最終アクセス：</strong> <span id="modalItemAccess"></span></p>
-            <div style="margin-top: 20px;">
-                <button class="btn btn-primary" onclick="editItem()">編集</button>
-                <button class="btn btn-danger" onclick="deleteItem()">削除</button>
-                <button class="btn btn-secondary" onclick="generateItemQR()">QRコード</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- その他のモーダル（プライバシーポリシー等）は前回のコードを継承 -->
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // グローバル変数
-        let locations = {};
-        let items = [];
-        let history = [];
-        let achievements = [];
-        let userStats = {
-            totalItems: 0,
-            totalLocations: 0,
-            savedTime: 0,
-            searchCount: 0,
-            photoCount: 0,
-            favoriteCount: 0,
-            xp: 0,
-            level: 1,
-            streak: 0,
-            lastActive: null
-        };
-        let currentFilters = [];
-        let currentView = 'tree';
-        let tutorialStep = 0;
-        let recognition = null;
-        let currentEditingItem = null;
-        
-        // 初期化
-        function init() {
-            loadData();
-            updateDashboard();
-            renderTreeView();
-            updateParentSelect();
-            checkAchievements();
-            initializeCharts();
-            checkDailyStreak();
-            
-            // 初回訪問チェック
-            if (!localStorage.getItem('hasVisited')) {
-                localStorage.setItem('hasVisited', 'true');
-                setTimeout(() => showTutorial(), 1000);
-            }
-            
-            // ローディング画面を非表示
-            setTimeout(() => {
-                document.getElementById('loadingScreen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('loadingScreen').style.display = 'none';
-                }, 500);
-            }, 1000);
-            
-            // PWA Service Worker登録
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js');
-            }
-            
-            // 音声認識APIチェック
-            if ('webkitSpeechRecognition' in window) {
-                recognition = new webkitSpeechRecognition();
-                recognition.lang = 'ja-JP';
-                recognition.continuous = false;
-                recognition.interimResults = false;
-            }
-        }
-        
-        // データ読み込み
-        function loadData() {
-            locations = JSON.parse(localStorage.getItem('locations') || '{}');
-            items = JSON.parse(localStorage.getItem('items') || '[]');
-            history = JSON.parse(localStorage.getItem('history') || '[]');
-            achievements = JSON.parse(localStorage.getItem('achievements') || '[]');
-            userStats = JSON.parse(localStorage.getItem('userStats') || JSON.stringify(userStats));
-        }
-        
-        // データ保存
-        function saveData() {
-            localStorage.setItem('locations', JSON.stringify(locations));
-            localStorage.setItem('items', JSON.stringify(items));
-            localStorage.setItem('history', JSON.stringify(history));
-            localStorage.setItem('achievements', JSON.stringify(achievements));
-            localStorage.setItem('userStats', JSON.stringify(userStats));
-        }
-        
-        // タブ切り替え
-        function switchTab(tabName) {
-            // すべてのタブを非表示
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // 選択されたタブを表示
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-            
-            // タブごとの初期化処理
-            if (tabName === 'analytics') {
-                updateCharts();
-            } else if (tabName === 'map') {
-                renderMapView();
-            }
-        }
-        
-        // ダッシュボード更新
-        function updateDashboard() {
-            document.getElementById('totalItems').textContent = items.length;
-            document.getElementById('totalLocations').textContent = Object.keys(locations).length;
-            document.getElementById('savedTime').textContent = Math.floor(items.length * 3);
-            document.getElementById('achievementCount').textContent = achievements.filter(a => a.unlocked).length;
-            
-            // アクティビティフィード更新
-            updateActivityFeed();
-            
-            // ミッション進捗更新
-            updateMissionProgress();
-        }
-        
-        // アイテム追加（拡張版）
-        function addItem() {
-            const parentSelect = document.getElementById('parentLocation');
-            const newParentInput = document.getElementById('newParentLocation');
-            const detailLocation = document.getElementById('detailLocation').value;
-            const itemName = document.getElementById('itemName').value;
-            const itemTags = document.getElementById('itemTags').value;
-            const itemMemo = document.getElementById('itemMemo').value;
-            const itemFavorite = document.getElementById('itemFavorite').checked;
-            const imageInput = document.getElementById('imageInput');
-            
-            if (!itemName || !detailLocation) {
-                showAlert('詳細場所とアイテム名は必須です', 'error');
-                return;
-            }
-            
-            let parentLocation = parentSelect.value;
-            if (!parentLocation) {
-                parentLocation = newParentInput.value;
-                if (!parentLocation) {
-                    showAlert('収納場所を入力してください', 'error');
-                    return;
-                }
-            }
-            
-            // 場所の階層構造を作成
-            if (!locations[parentLocation]) {
-                locations[parentLocation] = {};
-            }
-            if (!locations[parentLocation][detailLocation]) {
-                locations[parentLocation][detailLocation] = [];
-            }
-            
-            // 画像処理
-            let imageData = null;
-            if (imageInput.files && imageInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imageData = e.target.result;
-                    saveItemWithImage(imageData);
-                };
-                reader.readAsDataURL(imageInput.files[0]);
-            } else {
-                saveItemWithImage(null);
-            }
-            
-            function saveItemWithImage(imageData) {
-                // アイテム作成
-                const item = {
-                    id: Date.now(),
-                    name: itemName,
-                    tags: itemTags.split(' ').filter(tag => tag),
-                    memo: itemMemo,
-                    parent: parentLocation,
-                    detail: detailLocation,
-                    favorite: itemFavorite,
-                    image: imageData,
-                    createdAt: new Date().toISOString(),
-                    lastAccessed: new Date().toISOString(),
-                    accessCount: 0
-                };
-                
-                items.push(item);
-                locations[parentLocation][detailLocation].push(item);
-                
-                // 履歴に追加
-                addToHistory('add', item);
-                
-                // 統計更新
-                userStats.totalItems++;
-                if (imageData) userStats.photoCount++;
-                if (itemFavorite) userStats.favoriteCount++;
-                userStats.xp += 10;
-                if (imageData) userStats.xp += 5;
-                
-                // 保存
-                saveData();
-                
-                // UI更新
-                updateDashboard();
-                renderTreeView();
-                updateParentSelect();
-                
-                // フォームクリア
-                clearAddForm();
-                
-                // 成功通知
-                showAlert('アイテムを登録しました！ +10 XP', 'success');
-                
-                // 実績チェック
-                checkAchievements();
-            }
-        }
-        
-        // 連続追加
-        function addItemAndContinue() {
-            addItem();
-            // フォームをクリアしない
-        }
-        
-        // フォームクリア
-        function clearAddForm() {
-            document.getElementById('detailLocation').value = '';
-            document.getElementById('itemName').value = '';
-            document.getElementById('itemTags').value = '';
-            document.getElementById('itemMemo').value = '';
-            document.getElementById('itemFavorite').checked = false;
-            document.getElementById('imageInput').value = '';
-            document.getElementById('imagePreviewContainer').innerHTML = `
-                <p>クリックまたはドラッグ＆ドロップで画像を追加</p>
-                <p style="font-size: 0.8em; color: #666;">写真があると探しやすくなります！</p>
-            `;
-        }
-        
-        // 画像プレビュー
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('imagePreviewContainer').innerHTML = `
-                        <img src="${e.target.result}" class="image-preview" alt="プレビュー">
-                    `;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-        
-        // 検索実行
-        function performSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const resultsDiv = document.getElementById('searchResults');
-            resultsDiv.innerHTML = '';
-            
-            if (!query && currentFilters.length === 0) {
-                resultsDiv.innerHTML = '<p>検索キーワードを入力してください</p>';
-                return;
-            }
-            
-            let results = items.filter(item => {
-                // キーワード検索
-                const matchesQuery = !query || 
-                    item.name.toLowerCase().includes(query) ||
-                    item.memo.toLowerCase().includes(query) ||
-                    item.tags.some(tag => tag.toLowerCase().includes(query)) ||
-                    item.parent.toLowerCase().includes(query) ||
-                    item.detail.toLowerCase().includes(query);
-                
-                // フィルター適用
-                let matchesFilters = true;
-                if (currentFilters.includes('recent')) {
-                    const oneWeekAgo = new Date();
-                    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-                    matchesFilters = matchesFilters && new Date(item.createdAt) > oneWeekAgo;
-                }
-                if (currentFilters.includes('favorite')) {
-                    matchesFilters = matchesFilters && item.favorite;
-                }
-                if (currentFilters.includes('photo')) {
-                    matchesFilters = matchesFilters && item.image;
-                }
-                if (currentFilters.includes('frequent')) {
-                    matchesFilters = matchesFilters && item.accessCount > 5;
-                }
-                
-                return matchesQuery && matchesFilters;
-            });
-            
-            if (results.length === 0) {
-                resultsDiv.innerHTML = '<p>見つかりませんでした</p>';
-                return;
-            }
-            
-            // 検索結果を関連度でソート
-            results.sort((a, b) => {
-                // 完全一致を優先
-                const aExact = a.name.toLowerCase() === query;
-                const bExact = b.name.toLowerCase() === query;
-                if (aExact && !bExact) return -1;
-                if (!aExact && bExact) return 1;
-                
-                // アクセス頻度でソート
-                return b.accessCount - a.accessCount;
-            });
-            
-            // 結果表示
-            const itemsGrid = document.createElement('div');
-            itemsGrid.className = 'items-grid';
-            
-            results.forEach(item => {
-                const itemCard = createItemCard(item);
-                itemsGrid.appendChild(itemCard);
-            });
-            
-            resultsDiv.appendChild(itemsGrid);
-            
-            // 検索履歴に追加
-            addToHistory('search', { query, results: results.length });
-            userStats.searchCount++;
-            userStats.xp += 2;
-            saveData();
-        }
-        
-        // アイテムカード作成
-        function createItemCard(item) {
-            const card = document.createElement('div');
-            card.className = 'item-card' + (item.favorite ? ' favorite' : '');
-            card.onclick = () => showItemDetail(item);
-            
-            card.innerHTML = `
-                ${item.image ? `<img src="${item.image}" class="item-image" alt="${item.name}">` : ''}
-                <div class="item-name">${item.name}</div>
-                <div class="item-location">📍 ${item.parent} → ${item.detail}</div>
-                ${item.memo ? `<div style="color: #666; font-size: 0.9em;">📝 ${item.memo}</div>` : ''}
-                <div class="item-tags">
-                    ${item.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                </div>
-            `;
-            
-            return card;
-        }
-        
-        // アイテム詳細表示
-        function showItemDetail(item) {
-            currentEditingItem = item;
-            document.getElementById('modalItemName').textContent = item.name;
-            document.getElementById('modalItemLocation').textContent = `${item.parent} → ${item.detail}`;
-            document.getElementById('modalItemTags').textContent = item.tags.join(', ') || 'なし';
-            document.getElementById('modalItemMemo').textContent = item.memo || 'なし';
-            document.getElementById('modalItemDate').textContent = new Date(item.createdAt).toLocaleDateString('ja-JP');
-            document.getElementById('modalItemAccess').textContent = new Date(item.lastAccessed).toLocaleDateString('ja-JP');
-            
-            const modalImage = document.getElementById('modalItemImage');
-            if (item.image) {
-                modalImage.src = item.image;
-                modalImage.style.display = 'block';
-            } else {
-                modalImage.style.display = 'none';
-            }
-            
-            // アクセス記録更新
-            item.accessCount++;
-            item.lastAccessed = new Date().toISOString();
-            saveData();
-            
-            document.getElementById('itemDetailModal').style.display = 'block';
-        }
-        
-        // フィルター切り替え
-        function toggleFilter(chip, filter) {
-            chip.classList.toggle('active');
-            
-            const index = currentFilters.indexOf(filter);
-            if (index > -1) {
-                currentFilters.splice(index, 1);
-            } else {
-                currentFilters.push(filter);
-            }
-            
-            // 自動的に再検索
-            if (document.getElementById('searchInput').value || currentFilters.length > 0) {
-                performSearch();
-            }
-        }
-        
-        // ツリービュー表示
-        function renderTreeView() {
-            const mapView = document.getElementById('mapView');
-            mapView.innerHTML = '';
-            
-            Object.keys(locations).forEach(parent => {
-                const parentDiv = document.createElement('div');
-                parentDiv.className = 'tree-item';
-                parentDiv.innerHTML = `
-                    <span class="tree-icon">▶</span>
-                    <span>📦 ${parent}</span>
-                    <span class="tree-count">${Object.values(locations[parent]).reduce((sum, items) => sum + items.length, 0)}</span>
-                `;
-                
-                const childrenDiv = document.createElement('div');
-                childrenDiv.className = 'tree-children';
-                
-                Object.keys(locations[parent]).forEach(detail => {
-                    const detailDiv = document.createElement('div');
-                    detailDiv.className = 'tree-item';
-                    detailDiv.innerHTML = `
-                        <span class="tree-icon">▶</span>
-                        <span>📍 ${detail}</span>
-                        <span class="tree-count">${locations[parent][detail].length}</span>
-                    `;
+
+            <!-- サイドバー -->
+            <div class="space-y-6">
+                <!-- 新規登録 -->
+                <div class="bg-white p-6 rounded-lg custom-shadow">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-plus mr-2 text-green-600"></i>
+                        新規アイテム登録
+                    </h2>
+                    <button class="w-full bg-green-600 text-white p-4 rounded-lg hover:bg-green-700 transition font-medium">
+                        <i class="fas fa-plus mr-2"></i>
+                        アイテムを追加
+                    </button>
                     
-                    const itemsDiv = document.createElement('div');
-                    itemsDiv.className = 'tree-children';
-                    
-                    locations[parent][detail].forEach(item => {
-                        const itemDiv = document.createElement('div');
-                        itemDiv.className = 'tree-item';
-                        itemDiv.innerHTML = `
-                            <span>📄 ${item.name}</span>
-                            ${item.favorite ? '<span style="color: gold;">⭐</span>' : ''}
-                        `;
-                        itemDiv.onclick = (e) => {
-                            e.stopPropagation();
-                            showItemDetail(item);
-                        };
-                        itemsDiv.appendChild(itemDiv);
-                    });
-                    
-                    detailDiv.onclick = (e) => {
-                        e.stopPropagation();
-                        detailDiv.classList.toggle('expanded');
-                        itemsDiv.classList.toggle('show');
-                    };
-                    
-                    detailDiv.appendChild(itemsDiv);
-                    childrenDiv.appendChild(detailDiv);
-                });
-                
-                parentDiv.onclick = () => {
-                    parentDiv.classList.toggle('expanded');
-                    childrenDiv.classList.toggle('show');
-                };
-                
-                parentDiv.appendChild(childrenDiv);
-                mapView.appendChild(parentDiv);
-            });
-        }
-        
-        // マップビュー切り替え
-        function changeView(view) {
-            currentView = view;
-            if (view === 'tree') {
-                renderTreeView();
-            } else if (view === 'grid') {
-                renderGridView();
-            } else if (view === '3d') {
-                render3DView();
-            }
-        }
-        
-        // グリッドビュー
-        function renderGridView() {
-            const mapView = document.getElementById('mapView');
-            mapView.innerHTML = '<div class="items-grid" id="gridView"></div>';
-            
-            const grid = document.getElementById('gridView');
-            items.forEach(item => {
-                const card = createItemCard(item);
-                grid.appendChild(card);
-            });
-        }
-        
-        // 3Dビュー（簡易版）
-        function render3DView() {
-            const mapView = document.getElementById('mapView');
-            mapView.innerHTML = `
-                <div style="text-align: center; padding: 40px;">
-                    <h3>🎮 3Dビュー（開発中）</h3>
-                    <p>お部屋を3Dで表示して、直感的にアイテムの場所を確認できる機能を開発中です！</p>
-                    <div style="font-size: 100px; margin: 20px;">🏠</div>
-                    <p>近日公開予定</p>
-                </div>
-            `;
-        }
-        
-        // 音声検索
-        function startVoiceSearch() {
-            if (!recognition) {
-                showAlert('お使いのブラウザは音声認識に対応していません', 'error');
-                return;
-            }
-            
-            document.getElementById('voiceIndicator').classList.add('active');
-            document.getElementById('voiceStatus').textContent = '聞き取り中...';
-            
-            recognition.onresult = function(event) {
-                const transcript = event.results[0][0].transcript;
-                document.getElementById('searchInput').value = transcript;
-                document.getElementById('voiceStatus').textContent = `認識結果: ${transcript}`;
-                performSearch();
-                document.getElementById('voiceIndicator').classList.remove('active');
-            };
-            
-            recognition.onerror = function(event) {
-                showAlert('音声認識エラー: ' + event.error, 'error');
-                document.getElementById('voiceIndicator').classList.remove('active');
-            };
-            
-            recognition.start();
-        }
-        
-        // 音声入力
-        function startVoiceInput() {
-            if (!recognition) {
-                showAlert('お使いのブラウザは音声認識に対応していません', 'error');
-                return;
-            }
-            
-            showAlert('アイテム名を話してください', 'info');
-            
-            recognition.onresult = function(event) {
-                const transcript = event.results[0][0].transcript;
-                document.getElementById('itemName').value = transcript;
-                showAlert(`認識結果: ${transcript}`, 'success');
-            };
-            
-            recognition.start();
-        }
-        
-        // バーコードスキャナー（シミュレーション）
-        function startBarcodeScanner() {
-            showAlert('カメラアクセスを許可してください', 'info');
-            
-            // 実際の実装では、QuaggaJSなどのライブラリを使用
-            setTimeout(() => {
-                const mockBarcode = '4901234567890';
-                document.getElementById('barcodeResult').innerHTML = `
-                    <p>バーコード: ${mockBarcode}</p>
-                    <p>商品名: サンプル商品</p>
-                `;
-                document.getElementById('itemName').value = 'サンプル商品';
-            }, 2000);
-        }
-        
-        // 実績チェック
-        function checkAchievements() {
-            const achievementList = [
-                { id: 'first', name: '初めての登録', desc: '最初のアイテムを登録', condition: () => items.length >= 1, icon: '🎯', xp: 50 },
-                { id: 'collector10', name: 'コレクター', desc: '10個のアイテムを登録', condition: () => items.length >= 10, icon: '📦', xp: 100 },
-                { id: 'collector50', name: '収納エキスパート', desc: '50個のアイテムを登録', condition: () => items.length >= 50, icon: '🏆', xp: 200 },
-                { id: 'collector100', name: '収納マスター', desc: '100個のアイテムを登録', condition: () => items.length >= 100, icon: '👑', xp: 500 },
-                { id: 'photographer', name: '写真コレクター', desc: '30個の写真付きアイテム', condition: () => userStats.photoCount >= 30, icon: '📸', xp: 150 },
-                { id: 'searcher', name: '検索の達人', desc: '50回検索を実行', condition: () => userStats.searchCount >= 50, icon: '🔍', xp: 100 },
-                { id: 'organized', name: '整理整頓の鬼', desc: '10箇所以上の収納場所', condition: () => Object.keys(locations).length >= 10, icon: '🗂️', xp: 200 }
-            ];
-            
-            achievementList.forEach(achievement => {
-                if (!achievements.find(a => a.id === achievement.id) && achievement.condition()) {
-                    achievements.push({
-                        ...achievement,
-                        unlocked: true,
-                        unlockedAt: new Date().toISOString()
-                    });
-                    
-                    userStats.xp += achievement.xp;
-                    showAlert(`🎉 実績解除: ${achievement.name} (+${achievement.xp} XP)`, 'success');
-                }
-            });
-            
-            saveData();
-            updateAchievementDisplay();
-        }
-        
-        // 実績表示更新
-        function updateAchievementDisplay() {
-            const container = document.getElementById('achievements');
-            // 実績の表示更新処理
-        }
-        
-        // チャート初期化
-        function initializeCharts() {
-            const ctx = document.getElementById('usageChart');
-            if (ctx) {
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: getLast7Days(),
-                        datasets: [{
-                            label: '登録アイテム数',
-                            data: getItemCountByDay(),
-                            borderColor: 'rgb(74, 144, 226)',
-                            backgroundColor: 'rgba(74, 144, 226, 0.1)',
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            }
-        }
-        
-        // 過去7日間の日付取得
-        function getLast7Days() {
-            const days = [];
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                days.push(date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }));
-            }
-            return days;
-        }
-        
-        // 日別アイテム数取得
-        function getItemCountByDay() {
-            const counts = new Array(7).fill(0);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            items.forEach(item => {
-                const itemDate = new Date(item.createdAt);
-                itemDate.setHours(0, 0, 0, 0);
-                const daysDiff = Math.floor((today - itemDate) / (1000 * 60 * 60 * 24));
-                
-                if (daysDiff >= 0 && daysDiff < 7) {
-                    counts[6 - daysDiff]++;
-                }
-            });
-            
-            // 累積値に変換
-            for (let i = 1; i < counts.length; i++) {
-                counts[i] += counts[i - 1];
-            }
-            
-            return counts;
-        }
-        
-        // アクティビティフィード更新
-        function updateActivityFeed() {
-            const feed = document.getElementById('activityFeed');
-            feed.innerHTML = '';
-            
-            const recentHistory = history.slice(-10).reverse();
-            
-            recentHistory.forEach(activity => {
-                const item = document.createElement('div');
-                item.className = 'activity-item';
-                
-                const time = new Date(activity.timestamp);
-                const timeStr = formatRelativeTime(time);
-                
-                let icon, text;
-                if (activity.action === 'add') {
-                    icon = '📦';
-                    text = `${activity.item.name}を登録しました`;
-                } else if (activity.action === 'search') {
-                    icon = '🔍';
-                    text = `"${activity.query}"を検索 (${activity.results}件)`;
-                } else if (activity.action === 'delete') {
-                    icon = '🗑️';
-                    text = `${activity.item.name}を削除しました`;
-                }
-                
-                item.innerHTML = `
-                    <div class="activity-icon">${icon}</div>
-                    <div style="flex: 1;">
-                        <div>${text}</div>
-                        <div class="activity-time">${timeStr}</div>
+                    <div class="mt-4 space-y-2">
+                        <button class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 transition text-sm">
+                            <i class="fas fa-camera mr-2"></i>
+                            写真から登録
+                        </button>
+                        <button class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 transition text-sm">
+                            <i class="fas fa-qrcode mr-2"></i>
+                            QRコード/バーコード
+                        </button>
                     </div>
-                `;
+                </div>
+
+                <!-- クイックアクション -->
+                <div class="bg-white p-6 rounded-lg custom-shadow">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">クイックアクション</h2>
+                    <div class="space-y-3">
+                        <button class="w-full bg-blue-50 text-blue-700 p-3 rounded-lg hover:bg-blue-100 transition text-left">
+                            <i class="fas fa-map mr-3"></i>
+                            収納マップ
+                        </button>
+                        <button class="w-full bg-purple-50 text-purple-700 p-3 rounded-lg hover:bg-purple-100 transition text-left">
+                            <i class="fas fa-tags mr-3"></i>
+                            QRコード管理
+                        </button>
+                        <button class="w-full bg-orange-50 text-orange-700 p-3 rounded-lg hover:bg-orange-100 transition text-left">
+                            <i class="fas fa-chart-bar mr-3"></i>
+                            利用統計
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新規登録フォーム -->
+        <div class="bg-white p-6 rounded-lg custom-shadow mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-edit mr-2 text-blue-600"></i>
+                アイテム登録フォーム
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <!-- 写真アップロード -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-camera mr-2"></i>写真
+                        </label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition">
+                            <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-2"></i>
+                            <p class="text-gray-600">クリックまたはドラッグ＆ドロップで画像を追加</p>
+                            <p class="text-gray-400 text-sm mt-1">写真があると探しやすくなります！</p>
+                        </div>
+                    </div>
+
+                    <!-- アイテム名 -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-box mr-2"></i>アイテム名 *
+                        </label>
+                        <input type="text" placeholder="例：MacBookの充電器" 
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+
+                    <!-- タグ -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-tags mr-2"></i>タグ（スペース区切り）
+                        </label>
+                        <input type="text" placeholder="例：電子機器 充電器 Apple" 
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- 収納場所 -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-home mr-2"></i>収納場所（大分類）
+                        </label>
+                        <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option>選択してください</option>
+                            <option>リビング</option>
+                            <option>寝室</option>
+                            <option>キッチン</option>
+                            <option>書斎</option>
+                            <option>クローゼット</option>
+                            <option>その他</option>
+                        </select>
+                    </div>
+
+                    <!-- 詳細場所 -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-map-pin mr-2"></i>詳細場所
+                        </label>
+                        <input type="text" placeholder="例：テレビ台の引き出し 左上" 
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+
+                    <!-- メモ -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-sticky-note mr-2"></i>メモ
+                        </label>
+                        <textarea placeholder="その他の詳細情報..." rows="3"
+                                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                    </div>
+
+                    <!-- お気に入り -->
+                    <div class="flex items-center">
+                        <input type="checkbox" id="favorite" class="mr-2">
+                        <label for="favorite" class="text-gray-700 flex items-center">
+                            <i class="fas fa-star mr-2 text-yellow-500"></i>
+                            お気に入りに追加
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex gap-4">
+                <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-medium">
+                    <i class="fas fa-save mr-2"></i>
+                    保存
+                </button>
+                <button class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition font-medium">
+                    <i class="fas fa-times mr-2"></i>
+                    キャンセル
+                </button>
+            </div>
+        </div>
+
+        <!-- おすすめ収納グッズ -->
+        <div class="bg-white p-6 rounded-lg custom-shadow mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-2 flex items-center">
+                <i class="fas fa-shopping-cart mr-2 text-green-600"></i>
+                おすすめ収納グッズ
+            </h2>
+            <p class="text-gray-600 mb-6">プロが選ぶ！整理整頓が10倍はかどる人気アイテム</p>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="border border-gray-200 rounded-lg p-4 card-hover">
+                    <div class="bg-gray-100 h-32 rounded-lg mb-3 flex items-center justify-center">
+                        <i class="fas fa-box text-gray-400 text-2xl"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-800 mb-1">無印良品 収納ボックス</h3>
+                    <p class="text-gray-600 text-sm mb-2">シンプルで使いやすい定番商品</p>
+                    <p class="text-blue-600 font-bold">¥990〜</p>
+                </div>
                 
-                feed.appendChild(item);
-            });
-        }
-        
-        // 相対時間フォーマット
-        function formatRelativeTime(date) {
-            const now = new Date();
-            const diff = now - date;
-            const minutes = Math.floor(diff / 60000);
-            const hours = Math.floor(diff / 3600000);
-            const days = Math.floor(diff / 86400000);
-            
-            if (minutes < 1) return 'たった今';
-            if (minutes < 60) return `${minutes}分前`;
-            if (hours < 24) return `${hours}時間前`;
-            if (days < 7) return `${days}日前`;
-            return date.toLocaleDateString('ja-JP');
-        }
-        
-        // 履歴追加
-        function addToHistory(action, data) {
-            history.push({
-                action,
-                ...data,
-                timestamp: new Date().toISOString()
-            });
-            
-            // 履歴は最新1000件まで保持
-            if (history.length > 1000) {
-                history = history.slice(-1000);
-            }
-        }
-        
-        // デイリーストリーク確認
-        function checkDailyStreak() {
-            const today = new Date().toDateString();
-            const lastActive = userStats.lastActive ? new Date(userStats.lastActive).toDateString() : null;
-            
-            if (lastActive !== today) {
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
+                <div class="border border-gray-200 rounded-lg p-4 card-hover">
+                    <div class="bg-blue-100 h-32 rounded-lg mb-3 flex items-center justify-center">
+                        <i class="fas fa-th-large text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-800 mb-1">IKEA カラックス</h3>
+                    <p class="text-gray-600 text-sm mb-2">自由にカスタマイズできる収納棚</p>
+                    <p class="text-blue-600 font-bold">¥4,990〜</p>
+                </div>
                 
-                if (lastActive === yesterday.toDateString()) {
-                    userStats.streak++;
-                    showAlert(`🔥 ${userStats.streak}日連続ログイン！`, 'success');
-                } else {
-                    userStats.streak = 1;
-                }
+                <div class="border border-gray-200 rounded-lg p-4 card-hover">
+                    <div class="bg-purple-100 h-32 rounded-lg mb-3 flex items-center justify-center">
+                        <i class="fas fa-print text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-800 mb-1">ブラザー P-touch</h3>
+                    <p class="text-gray-600 text-sm mb-2">見やすいラベルで整理整頓</p>
+                    <p class="text-blue-600 font-bold">¥3,980</p>
+                </div>
                 
-                userStats.lastActive = new Date().toISOString();
-                saveData();
-            }
-        }
-        
-        // ミッション進捗更新
-        function updateMissionProgress() {
-            let completed = 0;
-            const total = 3;
+                <div class="border border-gray-200 rounded-lg p-4 card-hover">
+                    <div class="bg-orange-100 h-32 rounded-lg mb-3 flex items-center justify-center">
+                        <i class="fas fa-book text-orange-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-800 mb-1">片づけの魔法</h3>
+                    <p class="text-gray-600 text-sm mb-2">こんまり流で人生が変わる</p>
+                    <p class="text-blue-600 font-bold">¥1,540</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- フッター -->
+        <footer class="bg-white p-6 rounded-lg custom-shadow">
+            <div class="grid md:grid-cols-3 gap-6">
+                <div>
+                    <h3 class="font-bold text-gray-800 mb-3">サービスについて</h3>
+                    <ul class="space-y-2 text-gray-600 text-sm">
+                        <li><a href="#" class="hover:text-blue-600 transition">このサービスについて</a></li>
+                        <li><a href="#" class="hover:text-blue-600 transition">使い方ガイド</a></li>
+                        <li><a href="#" class="hover:text-blue-600 transition">よくある質問</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-bold text-gray-800 mb-3">法的情報</h3>
+                    <ul class="space-y-2 text-gray-600 text-sm">
+                        <li><a href="#" class="hover:text-blue-600 transition">プライバシーポリシー</a></li>
+                        <li><a href="#" class="hover:text-blue-600 transition">利用規約</a></li>
+                        <li><a href="#" class="hover:text-blue-600 transition">免責事項</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-bold text-gray-800 mb-3">サポート</h3>
+                    <ul class="space-y-2 text-gray-600 text-sm">
+                        <li><a href="#" class="hover:text-blue-600 transition">お問い合わせ</a></li>
+                        <li><a href="#" class="hover:text-blue-600 transition">不具合報告</a></li>
+                        <li><a href="#" class="hover:text-blue-600 transition">機能リクエスト</a></li>
+                    </ul>
+                </div>
+            </div>
             
-            // ミッション1: 5個以上登録
-            if (items.filter(item => {
-                const today = new Date().toDateString();
-                return new Date(item.createdAt).toDateString() === today;
-            }).length >= 5) {
-                document.getElementById('mission1').checked = true;
-                completed++;
-            }
-            
-            // ミッション2: 写真付き登録
-            if (items.some(item => {
-                const today = new Date().toDateString();
-                return new Date(item.createdAt).toDateString() === today && item.image;
-            })) {
-                document.getElementById('mission2').checked = true;
-                completed++;
-            }
-            
-            // 進捗バー更新
-            const progress = Math.round((completed / total) * 100);
-            const progressBar = document.getElementById('missionProgress');
-            progressBar.style.width = `${progress}%`;
-            progressBar.textContent = `${progress}%`;
-        }
-        
-        // FABメニュー切り替え
-        function toggleFABMenu() {
-            const menu = document.getElementById('fabMenu');
-            const icon = document.getElementById('fabIcon');
-            
-            if (menu.classList.contains('show')) {
-                menu.classList.remove('show');
-                icon.textContent = '➕';
-            } else {
-                menu.classList.add('show');
-                icon.textContent = '✖️';
-            }
-        }
-        
-        // クイック追加
-        function quickAdd() {
-            switchTab('add');
-            toggleFABMenu();
-        }
-        
-        // クイック検索
-        function quickSearch() {
-            switchTab('search');
-            toggleFABMenu();
-            document.getElementById('searchInput').focus();
-        }
-        
-        // クイックQR
-        function quickQR() {
-            generateBatchQR();
-            toggleFABMenu();
-        }
-        
-        // カスタムアラート表示
-        function showAlert(message, type = 'info') {
-            const alert = document.getElementById('customAlert');
-            alert.className = `custom-alert alert-${type}`;
-            alert.innerHTML = `
-                <strong>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</strong>
-                ${message}
-            `;
-            alert.style.display = 'block';
-            
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 3000);
-        }
-        
-        // チュートリアル
-        function showTutorial() {
-            const steps = [
-                { element: '.nav-tab', title: 'ようこそ！', text: 'まずは基本的な使い方を説明します' },
-                { element: '#add', title: 'アイテム登録', text: 'ここから持ち物を登録できます' },
-                { element: '#search', title: '検索機能', text: '登録したアイテムを素早く検索' },
-                { element: '.fab', title: 'クイックアクセス', text: 'よく使う機能にすぐアクセス' }
-            ];
-            
-            // チュートリアル実装
-        }
-        
-        // アフィリエイトトラッキング
-        function trackAffiliate(type) {
-            const affiliateLinks = {
-                'muji-box': 'https://px.a8.net/svt/ejp?a8mat=3T5D0N+8JMCZY+2HOM+BWGDT&a8ejpredirect=https%3A%2F%2Fwww.muji.com%2Fjp%2Fja%2Fstore',
-                'ikea-shelf': 'https://hb.afl.rakuten.co.jp/hgc/1a2b3c4d.5e6f7g8h.1a2b3c4d.9i0j1k2l/?pc=https%3A%2F%2Fwww.ikea.com%2Fjp%2Fja%2F',
-                'label-maker': 'https://www.amazon.co.jp/dp/B00KH8T5N6?tag=appadaycreator-22',
-                'storage-book': 'https://www.amazon.co.jp/dp/4763131206?tag=appadaycreator-22'
-            };
-            
-            if (affiliateLinks[type]) {
-                // トラッキング
-                addToHistory('affiliate', { type });
-                window.open(affiliateLinks[type], '_blank');
-            }
-        }
-        
-        // モーダル閉じる
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-        
-        // 親場所セレクト更新
-        function updateParentSelect() {
-            const select = document.getElementById('parentLocation');
-            select.innerHTML = '<option value="">新規作成</option>';
-            
-            Object.keys(locations).forEach(loc => {
-                const option = document.createElement('option');
-                option.value = loc;
-                option.textContent = loc;
-                select.appendChild(option);
-            });
-        }
-        
-        // 親場所選択時の処理
-        document.getElementById('parentLocation').addEventListener('change', function() {
-            const newParent = document.getElementById('newParentLocation');
-            if (this.value === '') {
-                newParent.style.display = 'block';
-            } else {
-                newParent.style.display = 'none';
-            }
-        });
-        
-        // モーダル外クリックで閉じる
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        }
-        
-        // プライバシーポリシー等の表示関数
-        function showPrivacyPolicy() {
-            showAlert('プライバシーポリシーページを準備中です', 'info');
-        }
-        
-        function showDisclaimer() {
-            showAlert('免責事項ページを準備中です', 'info');
-        }
-        
-        function showContact() {
-            showAlert('お問い合わせフォームを準備中です', 'info');
-        }
-        
-        // 初期化実行
-        window.onload = init;
-    </script>
+            <div class="border-t border-gray-200 mt-6 pt-6 text-center text-gray-500 text-sm">
+                <p>&copy; 2025 どこに置いたっけ？持ち物ロケーター. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
 </body>
 </html>
