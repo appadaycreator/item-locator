@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>利用統計 - どこに置いたっけ？</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        body { background: #f5f7fa; }
+    </style>
+</head>
+<body class="p-6">
+    <header class="mb-6">
+        <a href="index.html" class="text-blue-600 hover:underline"><i class="fas fa-arrow-left mr-2"></i>戻る</a>
+        <h1 class="text-2xl font-bold mt-2">利用統計</h1>
+    </header>
+    <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-white p-4 rounded-lg shadow">
+            <h2 class="font-medium mb-2">カテゴリー別アイテム数</h2>
+            <canvas id="itemsChart" height="200"></canvas>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow">
+            <h2 class="font-medium mb-2">直近7日間の検索回数</h2>
+            <canvas id="searchChart" height="200"></canvas>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+    <script src="stats.js"></script>
+</body>
+</html>
