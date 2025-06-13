@@ -31,7 +31,7 @@
             function buildTree(items) {
                 const root = {};
                 items.forEach(item => {
-                    const path = item.locationPath && item.locationPath.length ? item.locationPath : [item.parent, item.detail].filter(Boolean);
+                    const path = item.locationPath && item.locationPath.length ? item.locationPath : [item.room, item.location, item.detail].filter(Boolean);
                     let node = root;
                     path.forEach((p, idx) => {
                         if (!node[p]) node[p] = { items: [], children: {} };

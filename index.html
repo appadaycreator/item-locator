@@ -74,7 +74,7 @@
                         <i class="fas fa-home text-green-600 text-xl"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="text-gray-600 text-sm">収納場所</p>
+                        <p class="text-gray-600 text-sm">収納部屋</p>
                         <p class="text-2xl font-bold text-gray-800" id="locationCount">0</p>
                     </div>
                 </div>
@@ -162,6 +162,10 @@
                             <i class="fas fa-folder-open mr-3"></i>
                             収納場所管理
                         </a>
+                        <a href="rooms.html" class="block w-full bg-indigo-50 text-indigo-700 p-3 rounded-lg hover:bg-indigo-100 transition text-left">
+                            <i class="fas fa-door-closed mr-3"></i>
+                            収納部屋管理
+                        </a>
                         <button id="exportDataBtn" class="w-full bg-yellow-50 text-yellow-700 p-3 rounded-lg hover:bg-yellow-100 transition text-left">
                             <i class="fas fa-download mr-3"></i>
                             データエクスポート
@@ -220,10 +224,19 @@
                 </div>
 
                 <div class="space-y-4">
+                    <!-- 収納部屋 -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-door-closed mr-2"></i>収納部屋
+                        </label>
+                        <select id="roomSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option>選択してください</option>
+                        </select>
+                    </div>
                     <!-- 収納場所 -->
                     <div>
                         <label class="block text-gray-700 font-medium mb-2">
-                            <i class="fas fa-home mr-2"></i>収納場所（大分類）
+                            <i class="fas fa-home mr-2"></i>収納場所
                         </label>
                         <select id="parentLocation" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option>選択してください</option>
