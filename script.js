@@ -23,7 +23,7 @@ function initFontSizeControl() {
   const select = document.createElement('select');
   select.id = 'fontSizeSelect';
   // Remove fixed positioning so the control is placed in normal flow
-  select.className = 'p-2 border rounded bg-white shadow text-sm';
+  select.className = 'p-2 border rounded bg-white shadow text-sm text-black';
   const options = [
     { v: '20', l: '特大' },
     { v: '18', l: '大' },
