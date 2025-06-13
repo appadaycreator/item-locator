@@ -22,7 +22,8 @@ function saveFontSize(size) {
 function initFontSizeControl() {
   const select = document.createElement('select');
   select.id = 'fontSizeSelect';
-  select.className = 'fixed bottom-4 right-4 p-2 border rounded bg-white shadow text-sm';
+  // Remove fixed positioning so the control is placed in normal flow
+  select.className = 'p-2 border rounded bg-white shadow text-sm';
   const options = [
     { v: '20', l: '特大' },
     { v: '18', l: '大' },
@@ -36,7 +37,8 @@ function initFontSizeControl() {
     opt.textContent = o.l;
     select.appendChild(opt);
   });
-  document.body.appendChild(select);
+  const container = document.querySelector('header') || document.body;
+  container.appendChild(select);
   const size = loadFontSize();
   applyFontSize(size);
   select.value = size;
