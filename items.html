@@ -38,6 +38,19 @@
                 const info = document.createElement('div');
                 info.innerHTML = `<div class="font-medium">${item.name}</div><div class="text-sm text-gray-600">${item.parent} ${item.detail}</div>`;
                 div.appendChild(info);
+
+                const controls = document.createElement('div');
+                controls.className = 'ml-auto flex gap-2';
+                const editBtn = document.createElement('button');
+                editBtn.innerHTML = '<i class="fas fa-edit text-blue-500"></i>';
+                editBtn.addEventListener('click', () => editItem(item.id));
+                const delBtn = document.createElement('button');
+                delBtn.innerHTML = '<i class="fas fa-trash-alt text-red-500"></i>';
+                delBtn.addEventListener('click', () => deleteItem(item.id));
+                controls.appendChild(editBtn);
+                controls.appendChild(delBtn);
+                div.appendChild(controls);
+
                 container.appendChild(div);
             });
         }
