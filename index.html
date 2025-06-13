@@ -93,13 +93,13 @@
                         <i class="fas fa-search mr-2 text-blue-600"></i>
                         スマート検索
                     </h2>
-                    <div class="relative">
-                        <input id="searchInput" type="text" placeholder="アイテム名、場所、タグで検索..."
+                    <form action="items.html" method="get" class="relative" id="searchForm">
+                        <input id="searchInput" name="q" type="text" placeholder="アイテム名、場所、タグで検索..."
                                class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <button id="searchBtn" class="absolute right-3 top-3 bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition">
                             <i class="fas fa-search"></i>
                         </button>
-                    </div>
+                    </form>
                     
                     <!-- クイック検索ボタン -->
                     <div class="flex flex-wrap gap-2 mt-4">
