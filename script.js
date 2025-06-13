@@ -24,6 +24,12 @@ function addHistory(entry) {
   saveHistory(history);
 }
 
+function clearHistory() {
+  localStorage.removeItem(HISTORY_KEY);
+  updateDashboard();
+  renderHistory();
+}
+
 function updateDashboard() {
   const items = loadItems();
   document.getElementById('itemCount').textContent = items.length;
@@ -137,4 +143,5 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('cancelItem').addEventListener('click', () => {
     form.classList.add('hidden');
   });
+  document.getElementById('clearHistory').addEventListener('click', clearHistory);
 });
