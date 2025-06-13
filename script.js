@@ -49,6 +49,12 @@ function clearMonthlySearches() {
   renderHistory();
 }
 
+function clearHistory() {
+  saveHistory([]);
+  updateDashboard();
+  renderHistory();
+}
+
 function renderHistory() {
   const list = document.getElementById('activityList');
   list.innerHTML = '';
@@ -154,6 +160,14 @@ window.addEventListener('DOMContentLoaded', () => {
     clearBtn.addEventListener('click', () => {
       if (confirm('今月の検索履歴を削除しますか？')) {
         clearMonthlySearches();
+      }
+    });
+  }
+  const historyBtn = document.getElementById('clearHistory');
+  if (historyBtn) {
+    historyBtn.addEventListener('click', () => {
+      if (confirm('最近のアクティビティを削除しますか？')) {
+        clearHistory();
       }
     });
   }
