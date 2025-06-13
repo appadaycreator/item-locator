@@ -6,6 +6,7 @@
     <title>どこに置いたっけ？持ち物ロケーター</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
     <style>
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -56,7 +57,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">登録アイテム</p>
-                        <p class="text-2xl font-bold text-gray-800">127</p>
+                        <p class="text-2xl font-bold text-gray-800" id="itemCount">0</p>
                         <p class="text-green-500 text-xs">+12% 今週</p>
                     </div>
                 </div>
@@ -69,7 +70,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">収納場所</p>
-                        <p class="text-2xl font-bold text-gray-800">15</p>
+                        <p class="text-2xl font-bold text-gray-800" id="locationCount">0</p>
                     </div>
                 </div>
             </div>
@@ -81,7 +82,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">節約時間(分)</p>
-                        <p class="text-2xl font-bold text-gray-800">342</p>
+                        <p class="text-2xl font-bold text-gray-800" id="timeSaved">0</p>
                     </div>
                 </div>
             </div>
@@ -93,7 +94,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">今月の検索</p>
-                        <p class="text-2xl font-bold text-gray-800">89</p>
+                        <p class="text-2xl font-bold text-gray-800" id="searchCount">0</p>
                     </div>
                 </div>
             </div>
@@ -110,31 +111,32 @@
                         スマート検索
                     </h2>
                     <div class="relative">
-                        <input type="text" placeholder="アイテム名、場所、タグで検索..." 
+                        <input id="searchInput" type="text" placeholder="アイテム名、場所、タグで検索..."
                                class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <button class="absolute right-3 top-3 bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition">
+                        <button id="searchBtn" class="absolute right-3 top-3 bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
                     
                     <!-- クイック検索ボタン -->
                     <div class="flex flex-wrap gap-2 mt-4">
-                        <button class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition">
+                        <button id="recentBtn" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition">
                             最近追加
                         </button>
-                        <button class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition">
+                        <button id="favoriteBtn" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition">
                             お気に入り
                         </button>
-                        <button class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition">
+                        <button id="photoBtn" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition">
                             写真あり
                         </button>
-                        <button class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition">
+                        <button id="frequentBtn" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition">
                             よく使う
                         </button>
-                        <button class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm hover:bg-blue-200 transition">
+                        <button id="voiceBtn" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm hover:bg-blue-200 transition">
                             <i class="fas fa-microphone mr-1"></i> 音声検索
                         </button>
                     </div>
+                    <div id="searchResults" class="mt-4 space-y-2"></div>
                 </div>
 
                 <!-- 最近のアクティビティ -->
@@ -143,29 +145,7 @@
                         <i class="fas fa-history mr-2 text-green-600"></i>
                         最近のアクティビティ
                     </h2>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-plus-circle text-green-500 mr-3"></i>
-                                <span class="text-gray-700">「MacBookの充電器」を寝室に登録</span>
-                            </div>
-                            <span class="text-gray-400 text-sm">2分前</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-search text-blue-500 mr-3"></i>
-                                <span class="text-gray-700">「ハサミ」を検索</span>
-                            </div>
-                            <span class="text-gray-400 text-sm">15分前</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-edit text-orange-500 mr-3"></i>
-                                <span class="text-gray-700">「印鑑」の場所を更新</span>
-                            </div>
-                            <span class="text-gray-400 text-sm">1時間前</span>
-                        </div>
-                    </div>
+                    <div id="activityList" class="space-y-3"></div>
                 </div>
             </div>
 
@@ -241,7 +221,7 @@
                         <label class="block text-gray-700 font-medium mb-2">
                             <i class="fas fa-box mr-2"></i>アイテム名 *
                         </label>
-                        <input type="text" placeholder="例：MacBookの充電器" 
+                        <input id="itemName" type="text" placeholder="例：MacBookの充電器"
                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
 
@@ -250,7 +230,7 @@
                         <label class="block text-gray-700 font-medium mb-2">
                             <i class="fas fa-tags mr-2"></i>タグ（スペース区切り）
                         </label>
-                        <input type="text" placeholder="例：電子機器 充電器 Apple" 
+                        <input id="itemTags" type="text" placeholder="例：電子機器 充電器 Apple"
                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
                 </div>
@@ -261,7 +241,7 @@
                         <label class="block text-gray-700 font-medium mb-2">
                             <i class="fas fa-home mr-2"></i>収納場所（大分類）
                         </label>
-                        <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <select id="parentLocation" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option>選択してください</option>
                             <option>リビング</option>
                             <option>寝室</option>
@@ -277,7 +257,7 @@
                         <label class="block text-gray-700 font-medium mb-2">
                             <i class="fas fa-map-pin mr-2"></i>詳細場所
                         </label>
-                        <input type="text" placeholder="例：テレビ台の引き出し 左上" 
+                        <input id="detailLocation" type="text" placeholder="例：テレビ台の引き出し 左上"
                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
 
@@ -286,7 +266,7 @@
                         <label class="block text-gray-700 font-medium mb-2">
                             <i class="fas fa-sticky-note mr-2"></i>メモ
                         </label>
-                        <textarea placeholder="その他の詳細情報..." rows="3"
+                        <textarea id="itemMemo" placeholder="その他の詳細情報..." rows="3"
                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
                     </div>
 
@@ -302,11 +282,11 @@
             </div>
 
             <div class="mt-6 flex gap-4">
-                <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-medium">
+                <button id="saveItem" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-medium">
                     <i class="fas fa-save mr-2"></i>
                     保存
                 </button>
-                <button class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition font-medium">
+                <button id="cancelItem" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition font-medium">
                     <i class="fas fa-times mr-2"></i>
                     キャンセル
                 </button>
@@ -394,7 +374,15 @@
             <div class="border-t border-gray-200 mt-6 pt-6 text-center text-gray-500 text-sm">
                 <p>&copy; 2025 どこに置いたっけ？持ち物ロケーター. All rights reserved.</p>
             </div>
-        </footer>
+</footer>
     </div>
+    <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+    </script>
 </body>
 </html>
