@@ -163,6 +163,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const photoInput = document.getElementById('itemPhoto');
   const dropArea = document.getElementById('photoDrop');
+
+  const addFromPhotoBtn = document.getElementById('addFromPhoto');
+  if (addFromPhotoBtn && form && photoInput) {
+    addFromPhotoBtn.addEventListener('click', () => {
+      form.classList.remove('hidden');
+      form.scrollIntoView({ behavior: 'smooth' });
+      photoInput.click();
+    });
+  }
   if (photoInput && dropArea) {
     photoInput.addEventListener('change', e => {
       if (e.target.files[0]) handlePhoto(e.target.files[0]);
