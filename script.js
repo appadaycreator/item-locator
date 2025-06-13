@@ -1,5 +1,4 @@
 const ITEM_KEY = 'items';
-const HISTORY_KEY = 'history';
 
 let photoData = '';
 
@@ -11,21 +10,6 @@ function saveItems(items) {
   localStorage.setItem(ITEM_KEY, JSON.stringify(items));
 }
 
-function loadHistory() {
-  return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-}
-
-function saveHistory(history) {
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-}
-
-function addHistory(entry) {
-  const history = loadHistory();
-  history.unshift(entry);
-  history.splice(20); // keep last 20
-  saveHistory(history);
-}
-
 function updateDashboard() {
   const items = loadItems();
   const itemCountEl = document.getElementById('itemCount');
@@ -34,55 +18,8 @@ function updateDashboard() {
   const locationCountEl = document.getElementById('locationCount');
   if (locationCountEl) locationCountEl.textContent = locations.size;
 
-  const now = new Date();
-  const month = now.getMonth();
-  const history = loadHistory();
-  const searches = history.filter(
-    h => h.action === 'search' && new Date(h.timestamp).getMonth() === month
-  );
-  const searchCountEl = document.getElementById('searchCount');
-  if (searchCountEl) searchCountEl.textContent = searches.length;
 }
 
-function clearMonthlySearches() {
-  const now = new Date();
-  const month = now.getMonth();
-  const history = loadHistory();
-  const filtered = history.filter(
-    h => !(h.action === 'search' && new Date(h.timestamp).getMonth() === month)
-  );
-  saveHistory(filtered);
-  updateDashboard();
-  renderHistory();
-}
-
-function renderHistory() {
-  const list = document.getElementById('activityList');
-  if (!list) return;
-  list.innerHTML = '';
-  const history = loadHistory().slice(0, 3);
-  history.forEach(h => {
-    const div = document.createElement('div');
-    div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
-    const info = document.createElement('div');
-    info.className = 'flex items-center';
-    const icon = document.createElement('i');
-    if (h.action === 'add') icon.className = 'fas fa-plus-circle text-green-500 mr-3';
-    else icon.className = 'fas fa-search text-blue-500 mr-3';
-    const span = document.createElement('span');
-    span.className = 'text-gray-700';
-    if (h.action === 'add') span.textContent = `「${h.item.name}」を${h.item.parent}に登録`;
-    else span.textContent = `「${h.query}」を検索 (${h.results})件`;
-    const time = document.createElement('span');
-    time.className = 'text-gray-400 text-sm';
-    time.textContent = new Date(h.timestamp).toLocaleTimeString();
-    info.appendChild(icon);
-    info.appendChild(span);
-    div.appendChild(info);
-    div.appendChild(time);
-    list.appendChild(div);
-  });
-}
 
 function renderResults(results) {
   const container = document.getElementById('searchResults');
@@ -112,9 +49,7 @@ function search(query) {
     return keywords.every(k => text.includes(k));
   });
   renderResults(results);
-  addHistory({ action: 'search', query, results: results.length, timestamp: new Date().toISOString() });
   updateDashboard();
-  renderHistory();
 }
 
 function handlePhoto(file) {
@@ -152,9 +87,7 @@ function saveItem() {
     createdAt: new Date().toISOString()
   });
   saveItems(items);
-  addHistory({ action: 'add', item: { name, parent }, timestamp: new Date().toISOString() });
   updateDashboard();
-  renderHistory();
   document.getElementById('itemName').value = '';
   document.getElementById('itemTags').value = '';
   document.getElementById('parentLocation').selectedIndex = 0;
@@ -191,7 +124,6 @@ function editItem(id) {
   item.tags = tags.trim().split(/\s+/).filter(Boolean);
   saveItems(items);
   updateDashboard();
-  renderHistory();
   if (typeof renderAllItems === 'function') renderAllItems();
 }
 
@@ -200,13 +132,11 @@ function deleteItem(id) {
   const items = loadItems().filter(i => i.id !== id);
   saveItems(items);
   updateDashboard();
-  renderHistory();
   if (typeof renderAllItems === 'function') renderAllItems();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
   updateDashboard();
-  renderHistory();
   const searchBtn = document.getElementById('searchBtn');
   if (searchBtn) {
     searchBtn.addEventListener('click', () => {
@@ -228,14 +158,6 @@ window.addEventListener('DOMContentLoaded', () => {
   if (cancelBtn && form) {
     cancelBtn.addEventListener('click', () => {
       form.classList.add('hidden');
-    });
-  }
-  const clearBtn = document.getElementById('clearMonthlySearch');
-  if (clearBtn) {
-    clearBtn.addEventListener('click', () => {
-      if (confirm('今月の検索履歴を削除しますか？')) {
-        clearMonthlySearches();
-      }
     });
   }
 
