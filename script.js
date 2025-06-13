@@ -1,12 +1,25 @@
 const ITEM_KEY = 'items';
+const ROOM_KEY = 'rooms';
 const LOCATION_KEY = 'locations';
 
 let photoData = '';
 
+function loadRooms() {
+  const data = localStorage.getItem(ROOM_KEY);
+  if (data) return JSON.parse(data);
+  const defaults = ['リビング', '寝室', 'キッチン'];
+  localStorage.setItem(ROOM_KEY, JSON.stringify(defaults));
+  return defaults;
+}
+
+function saveRooms(rooms) {
+  localStorage.setItem(ROOM_KEY, JSON.stringify(rooms));
+}
+
 function loadLocations() {
   const data = localStorage.getItem(LOCATION_KEY);
   if (data) return JSON.parse(data);
-  const defaults = ['リビング', '寝室', 'キッチン', '書斎', 'クローゼット', 'その他'];
+  const defaults = [];
   localStorage.setItem(LOCATION_KEY, JSON.stringify(defaults));
   return defaults;
 }
@@ -15,19 +28,27 @@ function saveLocations(locations) {
   localStorage.setItem(LOCATION_KEY, JSON.stringify(locations));
 }
 
-function updateLocationOptions() {
+function updateRoomOptions() {
+  const select = document.getElementById('roomSelect');
+  if (!select) return;
+  const rooms = loadRooms();
+  select.innerHTML = '<option>選択してください</option>' +
+    rooms.map(r => `<option>${r}</option>`).join('');
+}
+
+function updateLocationOptions(room) {
   const select = document.getElementById('parentLocation');
   if (!select) return;
-  const locations = loadLocations();
+  const locations = loadLocations().filter(l => !room || l.room === room);
   select.innerHTML = '<option>選択してください</option>' +
-    locations.map(l => `<option>${l}</option>`).join('');
+    locations.map(l => `<option>${l.name}</option>`).join('');
 }
 
 function formatLocation(item) {
   if (item.locationPath && item.locationPath.length) {
     return item.locationPath.join(' > ');
   }
-  return [item.parent, item.detail].filter(Boolean).join(' > ');
+  return [item.room, item.location, item.detail].filter(Boolean).join(' > ');
 }
 
 function loadItems() {
@@ -36,7 +57,8 @@ function loadItems() {
     const item = { ...i, searchCount: i.searchCount || 0 };
     if (!item.locationPath) {
       const path = [];
-      if (item.parent) path.push(item.parent);
+      if (item.room) path.push(item.room);
+      if (item.location) path.push(item.location);
       if (item.detail) path.push(item.detail);
       item.locationPath = path;
     }
@@ -52,9 +74,9 @@ function updateDashboard() {
   const items = loadItems();
   const itemCountEl = document.getElementById('itemCount');
   if (itemCountEl) itemCountEl.textContent = items.length;
-  const locations = new Set(items.map(i => (i.locationPath && i.locationPath[0]) || i.parent));
+  const rooms = new Set(items.map(i => (i.locationPath && i.locationPath[0]) || i.room));
   const locationCountEl = document.getElementById('locationCount');
-  if (locationCountEl) locationCountEl.textContent = locations.size;
+  if (locationCountEl) locationCountEl.textContent = rooms.size;
 
 }
 
@@ -155,6 +177,7 @@ function handlePhoto(file) {
 function exportData() {
   const data = {
     items: loadItems(),
+    rooms: loadRooms(),
     locations: loadLocations()
   };
   const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
@@ -173,11 +196,14 @@ function importData(file) {
   reader.onload = e => {
     try {
       const data = JSON.parse(e.target.result);
-      if (Array.isArray(data.items) && Array.isArray(data.locations)) {
+      if (Array.isArray(data.items) && Array.isArray(data.locations) && Array.isArray(data.rooms)) {
         localStorage.setItem(ITEM_KEY, JSON.stringify(data.items));
         localStorage.setItem(LOCATION_KEY, JSON.stringify(data.locations));
+        localStorage.setItem(ROOM_KEY, JSON.stringify(data.rooms));
         updateDashboard();
-        updateLocationOptions();
+        updateRoomOptions();
+        const roomSelect = document.getElementById('roomSelect');
+        updateLocationOptions(roomSelect ? roomSelect.value : '');
         renderLocations();
         if (typeof renderAllItems === 'function') renderAllItems();
         alert('データをインポートしました');
@@ -194,16 +220,18 @@ function importData(file) {
 function saveItem() {
   const name = document.getElementById('itemName').value.trim();
   if (!name) return alert('アイテム名を入力してください');
+  let room = document.getElementById('roomSelect').value;
   let parent = document.getElementById('parentLocation').value;
   let detail = document.getElementById('detailLocation').value.trim();
   const pathInput = document.getElementById('locationPath');
   let locationPath = [];
   if (pathInput && pathInput.value.trim()) {
     locationPath = pathInput.value.trim().split('/').map(s => s.trim()).filter(Boolean);
-    parent = locationPath[0] || parent;
-    detail = locationPath[1] || detail;
+    room = locationPath[0] || room;
+    parent = locationPath[1] || parent;
+    detail = locationPath[2] || detail;
   } else {
-    locationPath = [parent, detail].filter(Boolean);
+    locationPath = [room, parent, detail].filter(Boolean);
   }
   const tags = document.getElementById('itemTags').value.trim().split(/\s+/).filter(Boolean);
   const memo = document.getElementById('itemMemo').value.trim();
@@ -214,7 +242,8 @@ function saveItem() {
   items.push({
     id: Date.now(),
     name,
-    parent,
+    room,
+    location: parent,
     detail,
     locationPath,
     tags,
@@ -252,7 +281,7 @@ function editItem(id) {
   if (!item) return;
   const name = prompt('アイテム名', item.name);
   if (name === null) return;
-  const loc = prompt('階層場所(/区切り)', (item.locationPath || [item.parent, item.detail]).join('/'));
+  const loc = prompt('階層場所(/区切り)', (item.locationPath || [item.room, item.location, item.detail]).join('/'));
   if (loc === null) return;
   const locPath = loc.split('/').map(s => s.trim()).filter(Boolean);
   const memo = prompt('メモ', item.memo);
@@ -262,8 +291,9 @@ function editItem(id) {
 
   item.name = name.trim();
   item.locationPath = locPath;
-  item.parent = locPath[0] || '';
-  item.detail = locPath[1] || '';
+  item.room = locPath[0] || '';
+  item.location = locPath[1] || '';
+  item.detail = locPath[2] || '';
   item.memo = memo.trim();
   item.tags = tags.trim().split(/\s+/).filter(Boolean);
   saveItems(items);
@@ -279,6 +309,67 @@ function deleteItem(id) {
   if (typeof renderAllItems === 'function') renderAllItems();
 }
 
+function renderRooms() {
+  const container = document.getElementById('roomsList');
+  if (!container) return;
+  const rooms = loadRooms();
+  container.innerHTML = '';
+  rooms.forEach((room, i) => {
+    const div = document.createElement('div');
+    div.className = 'p-3 bg-white rounded-lg shadow flex items-center justify-between';
+    const span = document.createElement('span');
+    span.textContent = room;
+    div.appendChild(span);
+    const controls = document.createElement('div');
+    controls.className = 'flex gap-2';
+    const editBtn = document.createElement('button');
+    editBtn.innerHTML = '<i class="fas fa-edit text-blue-500"></i>';
+    editBtn.addEventListener('click', () => editRoom(i));
+    const delBtn = document.createElement('button');
+    delBtn.innerHTML = '<i class="fas fa-trash-alt text-red-500"></i>';
+    delBtn.addEventListener('click', () => deleteRoom(i));
+    controls.appendChild(editBtn);
+    controls.appendChild(delBtn);
+    div.appendChild(controls);
+    container.appendChild(div);
+  });
+}
+
+function addRoom() {
+  const input = document.getElementById('newRoomName');
+  if (!input) return;
+  const name = input.value.trim();
+  if (!name) return alert('部屋名を入力してください');
+  const rooms = loadRooms();
+  rooms.push(name);
+  saveRooms(rooms);
+  input.value = '';
+  renderRooms();
+  updateRoomOptions();
+  updateLocationOptions();
+}
+
+function editRoom(index) {
+  const rooms = loadRooms();
+  const name = prompt('部屋名', rooms[index]);
+  if (name === null) return;
+  rooms[index] = name.trim();
+  saveRooms(rooms);
+  renderRooms();
+  updateRoomOptions();
+  updateLocationOptions();
+}
+
+function deleteRoom(index) {
+  if (!confirm('この部屋を削除しますか？')) return;
+  const rooms = loadRooms();
+  rooms.splice(index, 1);
+  saveRooms(rooms);
+  renderRooms();
+  updateRoomOptions();
+  updateLocationOptions();
+}
+
 function renderLocations() {
   const container = document.getElementById('locationsList');
   if (!container) return;
@@ -288,7 +379,7 @@ function renderLocations() {
     const div = document.createElement('div');
     div.className = 'p-3 bg-white rounded-lg shadow flex items-center justify-between';
     const span = document.createElement('span');
-    span.textContent = loc;
+    span.textContent = `${loc.room} - ${loc.name}`;
     div.appendChild(span);
     const controls = document.createElement('div');
     controls.className = 'flex gap-2';
@@ -307,40 +398,51 @@ function renderLocations() {
 
 function addLocation() {
   const input = document.getElementById('newLocationName');
+  const roomSelect = document.getElementById('locationRoomSelect');
   if (!input) return;
   const name = input.value.trim();
+  const room = roomSelect ? roomSelect.value : '';
   if (!name) return alert('収納場所名を入力してください');
+  if (!room) return alert('部屋を選択してください');
   const locations = loadLocations();
-  locations.push(name);
+  locations.push({ room, name });
   saveLocations(locations);
   input.value = '';
+  if (roomSelect) roomSelect.selectedIndex = 0;
   renderLocations();
-  updateLocationOptions();
+  updateLocationOptions(room);
 }
 
 function editLocation(index) {
   const locations = loadLocations();
-  const name = prompt('収納場所名', locations[index]);
+  const loc = locations[index];
+  const name = prompt('収納場所名', loc.name);
   if (name === null) return;
-  locations[index] = name.trim();
+  loc.name = name.trim();
   saveLocations(locations);
   renderLocations();
-  updateLocationOptions();
+  updateLocationOptions(loc.room);
 }
 
 function deleteLocation(index) {
   if (!confirm('この収納場所を削除しますか？')) return;
   const locations = loadLocations();
-  locations.splice(index, 1);
+  const loc = locations.splice(index, 1)[0];
   saveLocations(locations);
   renderLocations();
-  updateLocationOptions();
+  updateLocationOptions(loc.room);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
   updateDashboard();
-  updateLocationOptions();
+  updateRoomOptions();
+  const roomSelect = document.getElementById('roomSelect');
+  updateLocationOptions(roomSelect ? roomSelect.value : '');
   renderLocations();
+  renderRooms();
+  const addRoomBtn = document.getElementById('addRoomBtn');
+  if (addRoomBtn) addRoomBtn.addEventListener('click', addRoom);
+  if (roomSelect) roomSelect.addEventListener('change', e => updateLocationOptions(e.target.value));
   const addLocBtn = document.getElementById('addLocationBtn');
   if (addLocBtn) addLocBtn.addEventListener('click', addLocation);
   const searchBtn = document.getElementById('searchBtn');
