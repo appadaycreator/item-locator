@@ -1,6 +1,27 @@
 const ITEM_KEY = 'items';
+const LOCATION_KEY = 'locations';
 
 let photoData = '';
+
+function loadLocations() {
+  const data = localStorage.getItem(LOCATION_KEY);
+  if (data) return JSON.parse(data);
+  const defaults = ['リビング', '寝室', 'キッチン', '書斎', 'クローゼット', 'その他'];
+  localStorage.setItem(LOCATION_KEY, JSON.stringify(defaults));
+  return defaults;
+}
+
+function saveLocations(locations) {
+  localStorage.setItem(LOCATION_KEY, JSON.stringify(locations));
+}
+
+function updateLocationOptions() {
+  const select = document.getElementById('parentLocation');
+  if (!select) return;
+  const locations = loadLocations();
+  select.innerHTML = '<option>選択してください</option>' +
+    locations.map(l => `<option>${l}</option>`).join('');
+}
 
 function loadItems() {
   return JSON.parse(localStorage.getItem(ITEM_KEY) || '[]');
@@ -154,8 +175,70 @@ function deleteItem(id) {
   if (typeof renderAllItems === 'function') renderAllItems();
 }
 
+function renderLocations() {
+  const container = document.getElementById('locationsList');
+  if (!container) return;
+  const locations = loadLocations();
+  container.innerHTML = '';
+  locations.forEach((loc, i) => {
+    const div = document.createElement('div');
+    div.className = 'p-3 bg-white rounded-lg shadow flex items-center justify-between';
+    const span = document.createElement('span');
+    span.textContent = loc;
+    div.appendChild(span);
+    const controls = document.createElement('div');
+    controls.className = 'flex gap-2';
+    const editBtn = document.createElement('button');
+    editBtn.innerHTML = '<i class="fas fa-edit text-blue-500"></i>';
+    editBtn.addEventListener('click', () => editLocation(i));
+    const delBtn = document.createElement('button');
+    delBtn.innerHTML = '<i class="fas fa-trash-alt text-red-500"></i>';
+    delBtn.addEventListener('click', () => deleteLocation(i));
+    controls.appendChild(editBtn);
+    controls.appendChild(delBtn);
+    div.appendChild(controls);
+    container.appendChild(div);
+  });
+}
+
+function addLocation() {
+  const input = document.getElementById('newLocationName');
+  if (!input) return;
+  const name = input.value.trim();
+  if (!name) return alert('収納場所名を入力してください');
+  const locations = loadLocations();
+  locations.push(name);
+  saveLocations(locations);
+  input.value = '';
+  renderLocations();
+  updateLocationOptions();
+}
+
+function editLocation(index) {
+  const locations = loadLocations();
+  const name = prompt('収納場所名', locations[index]);
+  if (name === null) return;
+  locations[index] = name.trim();
+  saveLocations(locations);
+  renderLocations();
+  updateLocationOptions();
+}
+
+function deleteLocation(index) {
+  if (!confirm('この収納場所を削除しますか？')) return;
+  const locations = loadLocations();
+  locations.splice(index, 1);
+  saveLocations(locations);
+  renderLocations();
+  updateLocationOptions();
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   updateDashboard();
+  updateLocationOptions();
+  renderLocations();
+  const addLocBtn = document.getElementById('addLocationBtn');
+  if (addLocBtn) addLocBtn.addEventListener('click', addLocation);
   const searchBtn = document.getElementById('searchBtn');
   if (searchBtn) {
     searchBtn.addEventListener('click', () => {
