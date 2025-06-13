@@ -1,17 +1,18 @@
 const CACHE_NAME = 'item-locator-v1';
 const urlsToCache = [
-  '/item-locator/',
-  '/item-locator/index.html',
-  '/item-locator/manifest.json',
-  '/item-locator/icon-192.png',
-  '/item-locator/icon-512.png',
-  '/item-locator/favicon.png',
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  './favicon.png',
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(urlsToCache))
+      .catch(err => console.error('Cache addAll failed', err))
   );
 });
 
