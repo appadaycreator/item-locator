@@ -4,6 +4,48 @@ const LOCATION_KEY = 'locations';
 
 let photoData = '';
 
+const FONT_SIZE_KEY = 'fontSize';
+const DEFAULT_FONT_SIZE = '16';
+
+function applyFontSize(size) {
+  document.documentElement.style.fontSize = size + 'px';
+}
+
+function loadFontSize() {
+  return localStorage.getItem(FONT_SIZE_KEY) || DEFAULT_FONT_SIZE;
+}
+
+function saveFontSize(size) {
+  localStorage.setItem(FONT_SIZE_KEY, size);
+}
+
+function initFontSizeControl() {
+  const select = document.createElement('select');
+  select.id = 'fontSizeSelect';
+  select.className = 'fixed bottom-4 right-4 p-2 border rounded bg-white shadow text-sm';
+  const options = [
+    { v: '20', l: '特大' },
+    { v: '18', l: '大' },
+    { v: '16', l: '標準' },
+    { v: '14', l: '小' },
+    { v: '12', l: '極小' }
+  ];
+  options.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o.v;
+    opt.textContent = o.l;
+    select.appendChild(opt);
+  });
+  document.body.appendChild(select);
+  const size = loadFontSize();
+  applyFontSize(size);
+  select.value = size;
+  select.addEventListener('change', e => {
+    applyFontSize(e.target.value);
+    saveFontSize(e.target.value);
+  });
+}
+
 function loadRooms() {
   const data = localStorage.getItem(ROOM_KEY);
   if (data) return JSON.parse(data);
@@ -434,6 +476,8 @@ function deleteLocation(index) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  applyFontSize(loadFontSize());
+  initFontSizeControl();
   updateDashboard();
   updateRoomOptions();
   const roomSelect = document.getElementById('roomSelect');
