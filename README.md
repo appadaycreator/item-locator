@@ -12,7 +12,6 @@
 - **階層型収納管理**: 部屋→家具→引き出しのような階層構造で管理
 - **高速検索**: アイテム名、場所、タグで瞬時に検索
 - **写真登録**: 視覚的に分かりやすく管理
-- **QRコード生成**: 収納場所にQRコードを貼って素早くアクセス
 
 ### 🎮 ゲーミフィケーション
 - **XPシステム**: アイテム登録でXPを獲得
@@ -54,7 +53,6 @@ cd item-locator
 - LocalStorage API
 - Web Speech API
 - Chart.js
-- QRCode.js
 
 ### ファイル構成
 ```
@@ -97,7 +95,6 @@ MITライセンスのもとで公開されています。詳細は[LICENSE](LICE
 このアプリは30日連続開発チャレンジの一環として作成されました。
 - アイコン: Emoji
 - チャート: [Chart.js](https://www.chartjs.org/)
-- QRコード: [QRCode.js](https://davidshimjs.github.io/qrcodejs/)
 
 ## 📞 お問い合わせ
 
@@ -133,9 +130,6 @@ Made with ❤️ by AppADayCreator
 - データのエクスポート/インポート機能
 
 ### 4. 共有機能
-- QRコード生成
-  - 収納場所ごとのQRコード
-  - アイテム情報の共有
 - SNSシェア
   - Twitter
   - LINE

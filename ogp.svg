@@ -34,15 +34,6 @@
     <line x1="28" y1="28" x2="60" y2="60" stroke="white" stroke-width="8" stroke-linecap="round"/>
   </g>
   
-  <!-- QRコード風の模様 -->
-  <g transform="translate(350, 350)">
-    <rect x="0" y="0" width="80" height="80" fill="white" opacity="0.2" rx="10"/>
-    <rect x="10" y="10" width="20" height="20" fill="white" opacity="0.8"/>
-    <rect x="50" y="10" width="20" height="20" fill="white" opacity="0.8"/>
-    <rect x="10" y="50" width="20" height="20" fill="white" opacity="0.8"/>
-    <rect x="30" y="30" width="20" height="20" fill="white" opacity="0.6"/>
-    <rect x="50" y="50" width="20" height="20" fill="white" opacity="0.8"/>
-  </g>
   
   <!-- 装飾的な円 -->
   <circle cx="200" cy="100" r="60" fill="white" opacity="0.1"/>
