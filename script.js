@@ -130,4 +130,12 @@ window.addEventListener('DOMContentLoaded', () => {
     if (q) search(q);
   });
   document.getElementById('saveItem').addEventListener('click', saveItem);
+  const form = document.getElementById('itemForm');
+  document.getElementById('showItemForm').addEventListener('click', () => {
+    form.classList.remove('hidden');
+    form.scrollIntoView({ behavior: 'smooth' });
+  });
+  document.getElementById('cancelItem').addEventListener('click', () => {
+    form.classList.add('hidden');
+  });
 });
