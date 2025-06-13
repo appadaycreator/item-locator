@@ -23,6 +23,17 @@
             color: #357ABD;
             margin-top: 30px;
         }
+        details {
+            margin-top: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 10px 15px;
+        }
+        summary {
+            font-weight: bold;
+            cursor: pointer;
+            list-style: none;
+        }
         .container {
             background: white;
             padding: 40px;
@@ -49,23 +60,35 @@
     <div class="container">
         <h1>よくある質問</h1>
 
-        <h2>1. アイテムを登録するには？</h2>
-        <p>トップページの「アイテムを追加」ボタンから登録フォームを開き、必要な情報を入力して保存します。</p>
+        <details>
+            <summary>1. アイテムを登録するには？</summary>
+            <p>トップページの「アイテムを追加」ボタンから登録フォームを開き、必要な情報を入力して保存します。</p>
+        </details>
 
-        <h2>2. データはどこに保存されますか？</h2>
-        <p>すべてのデータはお使いの端末のローカルストレージにのみ保存され、外部サーバーには送信されません。</p>
+        <details>
+            <summary>2. データはどこに保存されますか？</summary>
+            <p>すべてのデータはお使いの端末のローカルストレージにのみ保存され、外部サーバーには送信されません。</p>
+        </details>
 
-        <h2>3. オフラインでも使えますか？</h2>
-        <p>はい。PWA対応のため、一度アクセスすればオフライン環境でもほとんどの機能を利用できます。</p>
+        <details>
+            <summary>3. オフラインでも使えますか？</summary>
+            <p>はい。PWA対応のため、一度アクセスすればオフライン環境でもほとんどの機能を利用できます。</p>
+        </details>
 
-        <h2>4. データのバックアップ方法は？</h2>
-        <p>設定画面からデータをJSON形式でエクスポートし、インポートすれば別の端末でも同じデータを利用できます。</p>
+        <details>
+            <summary>4. データのバックアップ方法は？</summary>
+            <p>設定画面からデータをJSON形式でエクスポートし、インポートすれば別の端末でも同じデータを利用できます。</p>
+        </details>
 
-        <h2>5. QRコードの使い方は？</h2>
-        <p>収納場所ごとに生成されるQRコードを印刷して貼り付けると、スマートフォンから素早く該当場所を開けます。</p>
+        <details>
+            <summary>5. QRコードの使い方は？</summary>
+            <p>収納場所ごとに生成されるQRコードを印刷して貼り付けると、スマートフォンから素早く該当場所を開けます。</p>
+        </details>
 
-        <h2>6. サポートへの連絡方法は？</h2>
-        <p>ご意見・ご要望は <a href="https://twitter.com/appadaycreator" target="_blank">@appadaycreator</a> までお寄せください。</p>
+        <details>
+            <summary>6. サポートへの連絡方法は？</summary>
+            <p>ご意見・ご要望は <a href="https://twitter.com/appadaycreator" target="_blank">@appadaycreator</a> までお寄せください。</p>
+        </details>
 
         <a href="index.html" class="back-link">← サービスに戻る</a>
     </div>
