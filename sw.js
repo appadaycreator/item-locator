@@ -6,7 +6,6 @@ const urlsToCache = [
   '/item-locator/icon-192.png',
   '/item-locator/icon-512.png',
   '/item-locator/favicon.png',
-  'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js'
 ];
 
 self.addEventListener('install', event => {
