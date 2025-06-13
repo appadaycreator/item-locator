@@ -25,6 +25,7 @@ function addHistory(entry) {
 }
 
 function clearHistory() {
+  if (!confirm('履歴を削除します。よろしいですか？')) return;
   localStorage.removeItem(HISTORY_KEY);
   updateDashboard();
   renderHistory();
@@ -46,9 +47,16 @@ function updateDashboard() {
 
 function renderHistory() {
   const list = document.getElementById('activityList');
+  const clearBtn = document.getElementById('clearHistory');
   list.innerHTML = '';
-  const history = loadHistory().slice(0, 3);
-  history.forEach(h => {
+  const history = loadHistory();
+  if (history.length === 0) {
+    list.innerHTML = '<p class="text-gray-500">履歴がありません</p>';
+    if (clearBtn) clearBtn.disabled = true;
+    return;
+  }
+  if (clearBtn) clearBtn.disabled = false;
+  history.slice(0, 3).forEach(h => {
     const div = document.createElement('div');
     div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
     const info = document.createElement('div');
