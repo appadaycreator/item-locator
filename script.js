@@ -37,6 +37,18 @@ function updateDashboard() {
   document.getElementById('searchCount').textContent = searches.length;
 }
 
+function clearMonthlySearches() {
+  const now = new Date();
+  const month = now.getMonth();
+  const history = loadHistory();
+  const filtered = history.filter(
+    h => !(h.action === 'search' && new Date(h.timestamp).getMonth() === month)
+  );
+  saveHistory(filtered);
+  updateDashboard();
+  renderHistory();
+}
+
 function renderHistory() {
   const list = document.getElementById('activityList');
   list.innerHTML = '';
@@ -137,4 +149,12 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('cancelItem').addEventListener('click', () => {
     form.classList.add('hidden');
   });
+  const clearBtn = document.getElementById('clearMonthlySearch');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      if (confirm('今月の検索履歴を削除しますか？')) {
+        clearMonthlySearches();
+      }
+    });
+  }
 });

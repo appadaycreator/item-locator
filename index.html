@@ -83,14 +83,17 @@
             
             
             <div class="bg-white p-6 rounded-lg custom-shadow card-hover">
-                <div class="flex items-center">
-                    <div class="bg-orange-100 p-3 rounded-full">
-                        <i class="fas fa-search text-orange-600 text-xl"></i>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="bg-orange-100 p-3 rounded-full">
+                            <i class="fas fa-search text-orange-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-gray-600 text-sm">今月の検索</p>
+                            <p class="text-2xl font-bold text-gray-800" id="searchCount">0</p>
+                        </div>
                     </div>
-                    <div class="ml-4">
-                        <p class="text-gray-600 text-sm">今月の検索</p>
-                        <p class="text-2xl font-bold text-gray-800" id="searchCount">0</p>
-                    </div>
+                    <button id="clearMonthlySearch" class="text-red-500 text-sm hover:underline">削除</button>
                 </div>
             </div>
         </div>
