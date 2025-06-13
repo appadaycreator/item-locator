@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お問い合わせ - どこに置いたっけ？</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        h1 {
+            color: #4A90E2;
+            border-bottom: 3px solid #4A90E2;
+            padding-bottom: 10px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            margin-top: 20px;
+            background: #4A90E2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #357ABD;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #4A90E2;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid #4A90E2;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .back-link:hover {
+            background: #4A90E2;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>お問い合わせ</h1>
+        <p>ご質問やご要望がありましたら、下記フォームよりご連絡ください。</p>
+        <form id="contactForm">
+            <label>お名前
+                <input type="text" id="contactName" required>
+            </label>
+            <label>メールアドレス
+                <input type="email" id="contactEmail" required>
+            </label>
+            <label>内容
+                <textarea id="contactMessage" rows="5" required></textarea>
+            </label>
+            <button type="submit">送信</button>
+        </form>
+        <p style="margin-top:20px;">または Twitter: <a href="https://twitter.com/appadaycreator" target="_blank">@appadaycreator</a> までご連絡ください。</p>
+        <a href="index.html" class="back-link">← サービスに戻る</a>
+    </div>
+    <script src="script.js"></script>
+    <script>
+      document.getElementById('contactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('contactName').value;
+        const email = document.getElementById('contactEmail').value;
+        const message = document.getElementById('contactMessage').value;
+        const subject = encodeURIComponent('お問い合わせ');
+        const body = encodeURIComponent(`お名前: ${name}\nメール: ${email}\n\n${message}`);
+        window.location.href = `mailto:appadaycreator@example.com?subject=${subject}&body=${body}`;
+      });
+    </script>
+</body>
+</html>
