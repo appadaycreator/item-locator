@@ -15,11 +15,13 @@
         <a href="index.html" class="text-blue-600 hover:underline"><i class="fas fa-arrow-left mr-2"></i>戻る</a>
         <h1 class="text-2xl font-bold mt-2">収納マップ</h1>
     </header>
+    <div id="floorPlan" class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6"></div>
     <div id="mapContainer" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
     <script src="script.js"></script>
     <script>
         function renderMap() {
             const container = document.getElementById('mapContainer');
+            const floor = document.getElementById('floorPlan');
             const items = loadItems();
             if (items.length === 0) {
                 container.innerHTML = '<p class="text-gray-600">まだアイテムが登録されていません。</p>';
@@ -41,9 +43,22 @@
                 map[item.parent][item.detail].push(item);
             });
 
+            floor.innerHTML = '';
+            Object.keys(map).forEach(parent => {
+                const cell = document.createElement('div');
+                cell.className = 'flex flex-col items-center p-4 bg-white rounded-lg shadow cursor-pointer hover:bg-blue-50';
+                cell.innerHTML = `<i class="fas ${iconMap[parent] || 'fa-box-open'} text-2xl mb-2"></i><span>${parent}</span>`;
+                cell.addEventListener('click', () => {
+                    const section = document.getElementById('sec-' + parent);
+                    if (section) section.scrollIntoView({ behavior: 'smooth' });
+                });
+                floor.appendChild(cell);
+            });
+
             for (const [parent, details] of Object.entries(map)) {
                 const parentDiv = document.createElement('div');
                 parentDiv.className = 'bg-white p-4 rounded-lg shadow flex flex-col gap-2';
+                parentDiv.id = 'sec-' + parent;
                 const parentTitle = document.createElement('div');
                 parentTitle.innerHTML = `<i class="fas ${iconMap[parent] || 'fa-box-open'} mr-2"></i>${parent}`;
                 parentTitle.className = 'font-bold text-lg';
