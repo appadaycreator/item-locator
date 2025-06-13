@@ -1,6 +1,8 @@
 const ITEM_KEY = 'items';
 const HISTORY_KEY = 'history';
 
+let selectedPhotoData = '';
+
 function loadItems() {
   return JSON.parse(localStorage.getItem(ITEM_KEY) || '[]');
 }
@@ -97,6 +99,7 @@ function saveItem() {
   const tags = document.getElementById('itemTags').value.trim().split(/\s+/).filter(Boolean);
   const memo = document.getElementById('itemMemo').value.trim();
   const favorite = document.getElementById('favorite').checked;
+  const photo = selectedPhotoData;
 
   const items = loadItems();
   items.push({
@@ -107,6 +110,7 @@ function saveItem() {
     tags,
     memo,
     favorite,
+    photo,
     createdAt: new Date().toISOString()
   });
   saveItems(items);
@@ -119,6 +123,10 @@ function saveItem() {
   document.getElementById('detailLocation').value = '';
   document.getElementById('itemMemo').value = '';
   document.getElementById('favorite').checked = false;
+  document.getElementById('itemPhoto').value = '';
+  document.getElementById('photoPreview').classList.add('hidden');
+  document.getElementById('photoPreview').src = '';
+  selectedPhotoData = '';
   alert('アイテムを保存しました');
 }
 
@@ -138,4 +146,29 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('cancelItem').addEventListener('click', () => {
     form.classList.add('hidden');
   });
+
+  const photoInput = document.getElementById('itemPhoto');
+  const photoPreview = document.getElementById('photoPreview');
+  if (photoInput) {
+    photoInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        selectedPhotoData = reader.result;
+        photoPreview.src = selectedPhotoData;
+        photoPreview.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  const addFromPhotoBtn = document.getElementById('addFromPhoto');
+  if (addFromPhotoBtn) {
+    addFromPhotoBtn.addEventListener('click', () => {
+      form.classList.remove('hidden');
+      form.scrollIntoView({ behavior: 'smooth' });
+      photoInput.click();
+    });
+  }
 });
