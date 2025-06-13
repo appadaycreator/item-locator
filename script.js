@@ -1,6 +1,8 @@
 const ITEM_KEY = 'items';
 const HISTORY_KEY = 'history';
 
+let photoData = '';
+
 function loadItems() {
   return JSON.parse(localStorage.getItem(ITEM_KEY) || '[]');
 }
@@ -81,8 +83,17 @@ function renderResults(results) {
   container.innerHTML = '';
   results.forEach(item => {
     const div = document.createElement('div');
-    div.className = 'p-3 bg-gray-50 rounded-lg flex justify-between';
-    div.innerHTML = `<span>${item.name} - ${item.parent} ${item.detail}</span>`;
+    div.className = 'p-3 bg-gray-50 rounded-lg flex items-center gap-3';
+    const info = document.createElement('div');
+    if (item.image) {
+      const img = document.createElement('img');
+      img.src = item.image;
+      img.alt = item.name;
+      img.className = 'w-16 h-16 object-cover rounded';
+      div.appendChild(img);
+    }
+    info.innerHTML = `<span>${item.name} - ${item.parent} ${item.detail}</span>`;
+    div.appendChild(info);
     container.appendChild(div);
   });
 }
@@ -100,6 +111,18 @@ function search(query) {
   renderHistory();
 }
 
+function handlePhoto(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    photoData = e.target.result;
+    const preview = document.getElementById('photoPreview');
+    if (preview) {
+      preview.innerHTML = `<img src="${photoData}" class="mx-auto mb-2 max-h-40 rounded-lg" alt="preview">`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
 function saveItem() {
   const name = document.getElementById('itemName').value.trim();
   if (!name) return alert('アイテム名を入力してください');
@@ -108,6 +131,7 @@ function saveItem() {
   const tags = document.getElementById('itemTags').value.trim().split(/\s+/).filter(Boolean);
   const memo = document.getElementById('itemMemo').value.trim();
   const favorite = document.getElementById('favorite').checked;
+  const image = photoData;
 
   const items = loadItems();
   items.push({
@@ -118,6 +142,7 @@ function saveItem() {
     tags,
     memo,
     favorite,
+    image,
     createdAt: new Date().toISOString()
   });
   saveItems(items);
@@ -130,6 +155,11 @@ function saveItem() {
   document.getElementById('detailLocation').value = '';
   document.getElementById('itemMemo').value = '';
   document.getElementById('favorite').checked = false;
+  photoData = '';
+  const preview = document.getElementById('photoPreview');
+  if (preview) {
+    preview.innerHTML = '<i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-2"></i><p class="text-gray-600">クリックまたはドラッグ＆ドロップで画像を追加</p><p class="text-gray-400 text-sm mt-1">写真があると探しやすくなります！</p>';
+  }
   alert('アイテムを保存しました');
 }
 
@@ -155,6 +185,26 @@ window.addEventListener('DOMContentLoaded', () => {
       if (confirm('今月の検索履歴を削除しますか？')) {
         clearMonthlySearches();
       }
+    });
+  }
+
+  const photoInput = document.getElementById('itemPhoto');
+  const dropArea = document.getElementById('photoDrop');
+  if (photoInput && dropArea) {
+    photoInput.addEventListener('change', e => {
+      if (e.target.files[0]) handlePhoto(e.target.files[0]);
+    });
+    dropArea.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropArea.classList.add('border-blue-400');
+    });
+    dropArea.addEventListener('dragleave', () => {
+      dropArea.classList.remove('border-blue-400');
+    });
+    dropArea.addEventListener('drop', e => {
+      e.preventDefault();
+      dropArea.classList.remove('border-blue-400');
+      if (e.dataTransfer.files[0]) handlePhoto(e.dataTransfer.files[0]);
     });
   }
 });
