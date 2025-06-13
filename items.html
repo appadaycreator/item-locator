@@ -13,19 +13,29 @@
 <body class="p-6">
     <header class="mb-6">
         <a href="index.html" class="text-blue-600 hover:underline"><i class="fas fa-arrow-left mr-2"></i>戻る</a>
-        <h1 class="text-2xl font-bold mt-2">登録アイテム一覧</h1>
+        <h1 class="text-2xl font-bold mt-2 mb-4">登録アイテム一覧</h1>
+        <form id="itemsSearchForm" action="items.html" method="get" class="flex max-w-md">
+            <input id="itemsSearchInput" name="q" type="text" placeholder="アイテム名、場所、タグで検索..." class="flex-grow p-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <button type="submit" id="itemsSearchBtn" class="bg-blue-600 text-white px-4 rounded-r-lg hover:bg-blue-700 transition"><i class="fas fa-search"></i></button>
+        </form>
     </header>
     <div id="itemsList" class="space-y-3"></div>
     <script src="script.js"></script>
     <script>
-        function renderAllItems() {
+        function renderAllItems(query = '') {
             const container = document.getElementById('itemsList');
             const items = loadItems();
-            if (items.length === 0) {
-                container.innerHTML = '<p class="text-gray-600">まだアイテムが登録されていません。</p>';
+            const keywords = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+            const filtered = keywords.length ? items.filter(item => {
+                const text = [item.name, item.memo, formatLocation(item), item.tags.join(' ')].join(' ').toLowerCase();
+                return keywords.every(k => text.includes(k));
+            }) : items;
+            container.innerHTML = '';
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="text-gray-600">該当するアイテムがありません。</p>';
                 return;
             }
-            items.forEach(item => {
+            filtered.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'p-4 bg-white rounded-lg shadow flex items-center gap-4';
                 if (item.image) {
@@ -54,7 +64,16 @@
                 container.appendChild(div);
             });
         }
-        document.addEventListener('DOMContentLoaded', renderAllItems);
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(location.search);
+            const q = params.get('q') || '';
+            const input = document.getElementById('itemsSearchInput');
+            if (input) {
+                input.value = q;
+                input.addEventListener('input', e => renderAllItems(e.target.value));
+            }
+            renderAllItems(q);
+        });
     </script>
 </body>
 </html>
