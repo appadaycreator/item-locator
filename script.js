@@ -24,7 +24,8 @@ function updateLocationOptions() {
 }
 
 function loadItems() {
-  return JSON.parse(localStorage.getItem(ITEM_KEY) || '[]');
+  const data = JSON.parse(localStorage.getItem(ITEM_KEY) || '[]');
+  return data.map(i => ({ ...i, searchCount: i.searchCount || 0 }));
 }
 
 function saveItems(items) {
@@ -69,8 +70,44 @@ function search(query) {
     const text = [item.name, item.memo, item.parent, item.detail, item.tags.join(' ')].join(' ').toLowerCase();
     return keywords.every(k => text.includes(k));
   });
+  results.forEach(item => {
+    item.searchCount = (item.searchCount || 0) + 1;
+  });
+  saveItems(items);
   renderResults(results);
+  const countEl = document.getElementById('resultCount');
+  if (countEl) countEl.textContent = `${results.length}件見つかりました`;
   updateDashboard();
+}
+
+function searchRecent() {
+  const items = loadItems().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const results = items.slice(0, 10);
+  renderResults(results);
+  const countEl = document.getElementById('resultCount');
+  if (countEl) countEl.textContent = `最近追加された${results.length}件を表示`;
+}
+
+function searchFavorite() {
+  const items = loadItems().filter(i => i.favorite);
+  renderResults(items);
+  const countEl = document.getElementById('resultCount');
+  if (countEl) countEl.textContent = `${items.length}件のお気に入り`;
+}
+
+function searchPhoto() {
+  const items = loadItems().filter(i => i.image);
+  renderResults(items);
+  const countEl = document.getElementById('resultCount');
+  if (countEl) countEl.textContent = `${items.length}件の写真付きアイテム`;
+}
+
+function searchFrequent() {
+  const items = loadItems().sort((a, b) => (b.searchCount || 0) - (a.searchCount || 0));
+  const results = items.slice(0, 10);
+  renderResults(results);
+  const countEl = document.getElementById('resultCount');
+  if (countEl) countEl.textContent = `よく検索された${results.length}件`;
 }
 
 function handlePhoto(file) {
@@ -119,7 +156,8 @@ function saveItem() {
     memo,
     favorite,
     image,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    searchCount: 0
   });
   try {
     saveItems(items);
@@ -245,6 +283,32 @@ window.addEventListener('DOMContentLoaded', () => {
       const q = document.getElementById('searchInput').value;
       if (q) search(q);
     });
+  }
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', e => search(e.target.value));
+  }
+  const recentBtn = document.getElementById('recentBtn');
+  if (recentBtn) recentBtn.addEventListener('click', searchRecent);
+  const favoriteBtn = document.getElementById('favoriteBtn');
+  if (favoriteBtn) favoriteBtn.addEventListener('click', searchFavorite);
+  const photoBtn = document.getElementById('photoBtn');
+  if (photoBtn) photoBtn.addEventListener('click', searchPhoto);
+  const frequentBtn = document.getElementById('frequentBtn');
+  if (frequentBtn) frequentBtn.addEventListener('click', searchFrequent);
+  const voiceBtn = document.getElementById('voiceBtn');
+  if (voiceBtn && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+    const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new Rec();
+    recognition.lang = 'ja-JP';
+    recognition.addEventListener('result', e => {
+      const text = e.results[0][0].transcript;
+      if (searchInput) {
+        searchInput.value = text;
+        search(text);
+      }
+    });
+    voiceBtn.addEventListener('click', () => recognition.start());
   }
   const saveBtn = document.getElementById('saveItem');
   if (saveBtn) saveBtn.addEventListener('click', saveItem);
