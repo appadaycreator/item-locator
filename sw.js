@@ -2,6 +2,7 @@ const CACHE_NAME = 'item-locator-v1';
 const urlsToCache = [
   '/item-locator/',
   '/item-locator/index.html',
+  '/item-locator/qr.html',
   '/item-locator/manifest.json',
   '/item-locator/icon-192.png',
   '/item-locator/icon-512.png',
