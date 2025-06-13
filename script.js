@@ -144,7 +144,7 @@ function handlePhoto(file) {
       photoData = canvas.toDataURL('image/jpeg', 0.8);
       const preview = document.getElementById('photoPreview');
       if (preview) {
-        preview.innerHTML = `<img src="${photoData}" class="mx-auto mb-2 max-h-40 rounded-lg" alt="preview">`;
+        preview.innerHTML = `<img src="${photoData}" class="mx-auto mb-2 max-h-40 rounded-lg max-w-full" alt="preview">`;
       }
     };
     img.src = e.target.result;
