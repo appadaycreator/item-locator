@@ -28,15 +28,20 @@ function addHistory(entry) {
 
 function updateDashboard() {
   const items = loadItems();
-  document.getElementById('itemCount').textContent = items.length;
+  const itemCountEl = document.getElementById('itemCount');
+  if (itemCountEl) itemCountEl.textContent = items.length;
   const locations = new Set(items.map(i => i.parent));
-  document.getElementById('locationCount').textContent = locations.size;
+  const locationCountEl = document.getElementById('locationCount');
+  if (locationCountEl) locationCountEl.textContent = locations.size;
 
   const now = new Date();
   const month = now.getMonth();
   const history = loadHistory();
-  const searches = history.filter(h => h.action === 'search' && new Date(h.timestamp).getMonth() === month);
-  document.getElementById('searchCount').textContent = searches.length;
+  const searches = history.filter(
+    h => h.action === 'search' && new Date(h.timestamp).getMonth() === month
+  );
+  const searchCountEl = document.getElementById('searchCount');
+  if (searchCountEl) searchCountEl.textContent = searches.length;
 }
 
 function clearMonthlySearches() {
@@ -53,6 +58,7 @@ function clearMonthlySearches() {
 
 function renderHistory() {
   const list = document.getElementById('activityList');
+  if (!list) return;
   list.innerHTML = '';
   const history = loadHistory().slice(0, 3);
   history.forEach(h => {
@@ -163,22 +169,67 @@ function saveItem() {
   alert('アイテムを保存しました');
 }
 
+function editItem(id) {
+  const items = loadItems();
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  const name = prompt('アイテム名', item.name);
+  if (name === null) return;
+  const parent = prompt('場所', item.parent);
+  if (parent === null) return;
+  const detail = prompt('詳細', item.detail);
+  if (detail === null) return;
+  const memo = prompt('メモ', item.memo);
+  if (memo === null) return;
+  const tags = prompt('タグ(スペース区切り)', item.tags.join(' '));
+  if (tags === null) return;
+
+  item.name = name.trim();
+  item.parent = parent.trim();
+  item.detail = detail.trim();
+  item.memo = memo.trim();
+  item.tags = tags.trim().split(/\s+/).filter(Boolean);
+  saveItems(items);
+  updateDashboard();
+  renderHistory();
+  if (typeof renderAllItems === 'function') renderAllItems();
+}
+
+function deleteItem(id) {
+  if (!confirm('このアイテムを削除しますか？')) return;
+  const items = loadItems().filter(i => i.id !== id);
+  saveItems(items);
+  updateDashboard();
+  renderHistory();
+  if (typeof renderAllItems === 'function') renderAllItems();
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   updateDashboard();
   renderHistory();
-  document.getElementById('searchBtn').addEventListener('click', () => {
-    const q = document.getElementById('searchInput').value;
-    if (q) search(q);
-  });
-  document.getElementById('saveItem').addEventListener('click', saveItem);
+  const searchBtn = document.getElementById('searchBtn');
+  if (searchBtn) {
+    searchBtn.addEventListener('click', () => {
+      const q = document.getElementById('searchInput').value;
+      if (q) search(q);
+    });
+  }
+  const saveBtn = document.getElementById('saveItem');
+  if (saveBtn) saveBtn.addEventListener('click', saveItem);
   const form = document.getElementById('itemForm');
-  document.getElementById('showItemForm').addEventListener('click', () => {
-    form.classList.remove('hidden');
-    form.scrollIntoView({ behavior: 'smooth' });
-  });
-  document.getElementById('cancelItem').addEventListener('click', () => {
-    form.classList.add('hidden');
-  });
+  const showFormBtn = document.getElementById('showItemForm');
+  if (showFormBtn && form) {
+    showFormBtn.addEventListener('click', () => {
+      form.classList.remove('hidden');
+      form.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+  const cancelBtn = document.getElementById('cancelItem');
+  if (cancelBtn && form) {
+    cancelBtn.addEventListener('click', () => {
+      form.classList.add('hidden');
+    });
+  }
   const clearBtn = document.getElementById('clearMonthlySearch');
   if (clearBtn) {
     clearBtn.addEventListener('click', () => {
