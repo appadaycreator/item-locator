@@ -1,16 +1,22 @@
 {
-    "name": "Item Locator",
-    "short_name": "ItemLocator",
-    "description": "アイテムの位置を簡単に管理できるアプリケーション",
-    "start_url": "/",
+    "name": "どこに置いたっけ？持ち物ロケーター",
+    "short_name": "持ち物ロケーター",
+    "description": "探し物の時間をゼロに！持ち物の場所を階層管理できる無料アプリ",
+    "start_url": "/item-locator/",
     "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#333333",
+    "background_color": "#f5f7fa",
+    "theme_color": "#4A90E2",
+    "orientation": "portrait",
     "icons": [
-        {
-            "src": "ogp.svg",
-            "sizes": "192x192",
-            "type": "image/svg+xml"
-        }
+      {
+        "src": "icon-192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "icon-512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
     ]
-} 
+  }

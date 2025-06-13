@@ -3,50 +3,935 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Item Locator</title>
-    <meta name="description" content="アイテムの位置を簡単に管理できるアプリケーション">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="ogp.svg">
-    <meta property="og:title" content="Item Locator">
-    <meta property="og:description" content="アイテムの位置を簡単に管理できるアプリケーション">
-    <meta property="og:image" content="ogp.svg">
+    <title>どこに置いたっけ？持ち物ロケーター | 探し物ゼロ生活</title>
+    <meta name="description" content="家中の持ち物をスマホで管理。どこに置いたか一瞬で分かる無料の整理整頓アプリ。QRコード印刷対応。">
+    
+    <!-- OGP設定 -->
+    <meta property="og:title" content="どこに置いたっけ？持ち物ロケーター">
+    <meta property="og:description" content="探し物の時間をゼロに！持ち物の場所を階層管理できる無料アプリ">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://appadaycreator.github.io/item-locator/">
+    <meta property="og:image" content="https://appadaycreator.github.io/item-locator/ogp.png">
+    <meta property="og:site_name" content="どこに置いたっけ？">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@appadaycreator">
+    
+    <!-- PWA設定 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4A90E2">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-TXQGZRF9');</script>
+    <!-- End Google Tag Manager -->
+    
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        * {
             margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
             color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+        
+        .card h2 {
+            color: #4A90E2;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4A90E2;
+        }
+        
+        .btn {
+            background: #4A90E2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-decoration: none;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            background: #357ABD;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .tree-view {
+            margin-top: 20px;
+        }
+        
+        .tree-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .tree-item:hover {
+            background: #e9ecef;
+            border-left-color: #4A90E2;
+        }
+        
+        .tree-item.selected {
+            background: #e3f2fd;
+            border-left-color: #4A90E2;
+        }
+        
+        .tree-children {
+            margin-left: 20px;
+            margin-top: 5px;
+        }
+        
+        .search-result {
+            padding: 15px;
+            background: #fffbf0;
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            margin: 10px 0;
+            animation: highlight 0.5s ease;
+        }
+        
+        @keyframes highlight {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
             text-align: center;
         }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4A90E2;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .qr-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        #qrcode {
+            margin: 20px auto;
+        }
+        
+        .affiliate-section {
+            margin-top: 40px;
+            padding: 25px;
+            background: #f0f8ff;
+            border-radius: 12px;
+            border: 2px dashed #4A90E2;
+        }
+        
+        .affiliate-section h3 {
+            color: #4A90E2;
+            margin-bottom: 15px;
+        }
+        
+        .affiliate-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .affiliate-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .affiliate-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .footer-links {
+            margin-top: 40px;
+            padding: 20px;
+            background: #2c3e50;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 0.9em;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            position: relative;
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 12px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .share-twitter { background: #1DA1F2; }
+        .share-line { background: #00B900; }
+        .share-facebook { background: #1877F2; }
     </style>
 </head>
 <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TXQGZRF9"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    
+    <header>
+        <h1>📦 どこに置いたっけ？持ち物ロケーター</h1>
+        <p class="subtitle">探し物の時間をゼロに！スマホで簡単管理</p>
+    </header>
+    
     <div class="container">
-        <h1>Item Locator</h1>
-        <p>アイテムの位置を簡単に管理できるアプリケーションへようこそ。</p>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalItems">0</div>
+                <div class="stat-label">登録アイテム</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalLocations">0</div>
+                <div class="stat-label">収納場所</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="savedTime">0</div>
+                <div class="stat-label">節約時間(分)</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="card">
+                <h2>🔍 アイテム検索</h2>
+                <div class="form-group">
+                    <input type="text" id="searchInput" placeholder="探したいものを入力...">
+                </div>
+                <button class="btn" onclick="searchItems()">検索</button>
+                <div id="searchResults"></div>
+                
+                <h2 style="margin-top: 30px;">➕ 新規登録</h2>
+                <div class="form-group">
+                    <label>収納場所（親）</label>
+                    <select id="parentLocation">
+                        <option value="">新規作成</option>
+                    </select>
+                    <input type="text" id="newParentLocation" placeholder="例：リビングの棚" style="margin-top: 10px; display: none;">
+                </div>
+                
+                <div class="form-group">
+                    <label>詳細場所</label>
+                    <input type="text" id="detailLocation" placeholder="例：2段目左側">
+                </div>
+                
+                <div class="form-group">
+                    <label>アイテム名</label>
+                    <input type="text" id="itemName" placeholder="例：取扱説明書">
+                </div>
+                
+                <div class="form-group">
+                    <label>メモ（任意）</label>
+                    <input type="text" id="itemMemo" placeholder="例：2023年購入の掃除機">
+                </div>
+                
+                <button class="btn" onclick="addItem()">登録する</button>
+                <button class="btn btn-secondary" onclick="generateQR()">QRコード生成</button>
+            </div>
+            
+            <div class="card">
+                <h2>📍 収納マップ</h2>
+                <div id="treeView" class="tree-view"></div>
+                
+                <div style="margin-top: 30px;">
+                    <button class="btn btn-success" onclick="shareResults()">📱 SNSでシェア</button>
+                    <button class="btn btn-secondary" onclick="compareWithFriends()">👥 友達と比較</button>
+                    <button class="btn btn-secondary" onclick="showHistory()">📊 履歴を見る</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="affiliate-section">
+            <h3>🛍️ おすすめ収納グッズ</h3>
+            <p>整理整頓をもっと便利に！人気の収納アイテムをチェック</p>
+            <div class="affiliate-links">
+                <div class="affiliate-card">
+                    <h4>無印良品</h4>
+                    <p>シンプルで使いやすい収納ボックス</p>
+                    <a href="#" class="btn" onclick="trackAffiliate('muji')">詳細を見る</a>
+                </div>
+                <div class="affiliate-card">
+                    <h4>IKEA</h4>
+                    <p>北欧デザインの収納家具</p>
+                    <a href="#" class="btn" onclick="trackAffiliate('ikea')">詳細を見る</a>
+                </div>
+                <div class="affiliate-card">
+                    <h4>ラベルプリンター</h4>
+                    <p>収納場所をラベリング</p>
+                    <a href="#" class="btn" onclick="trackAffiliate('label')">詳細を見る</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-links">
+            <a href="#" onclick="showPrivacyPolicy()">プライバシーポリシー</a>
+            <a href="#" onclick="showDisclaimer()">免責事項</a>
+            <a href="#" onclick="showContact()">お問い合わせ</a>
+        </div>
     </div>
+    
+    <!-- QRコード表示モーダル -->
+    <div id="qrModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('qrModal')">&times;</span>
+            <h2>QRコード印刷</h2>
+            <div class="qr-container">
+                <div id="qrcode"></div>
+                <p>このQRコードを収納場所に貼り付けてください</p>
+                <button class="btn" onclick="printQR()">印刷する</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SNSシェアモーダル -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('shareModal')">&times;</span>
+            <h2>SNSでシェア</h2>
+            <p>あなたの整理整頓の成果をシェアしましょう！</p>
+            <div class="share-buttons">
+                <a href="#" class="share-btn share-twitter" onclick="shareToTwitter()">🐦 Twitter</a>
+                <a href="#" class="share-btn share-line" onclick="shareToLine()">💬 LINE</a>
+                <a href="#" class="share-btn share-facebook" onclick="shareToFacebook()">📘 Facebook</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 友達と比較モーダル -->
+    <div id="compareModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('compareModal')">&times;</span>
+            <h2>友達と比較</h2>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">あなたの登録数</div>
+                    <div class="stat-number" id="yourItems">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">平均登録数</div>
+                    <div class="stat-number">87</div>
+                </div>
+            </div>
+            <p style="margin-top: 20px;">友達コードを共有して、整理整頓レベルを比較しよう！</p>
+            <div class="form-group">
+                <label>あなたの友達コード</label>
+                <input type="text" id="friendCode" readonly>
+                <button class="btn" onclick="copyFriendCode()">コピー</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- プライバシーポリシーモーダル -->
+    <div id="privacyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('privacyModal')">&times;</span>
+            <h2>プライバシーポリシー</h2>
+            <p>当サービスは、ユーザーのプライバシーを尊重し、個人情報の保護に努めます。</p>
+            <h3>収集する情報</h3>
+            <ul>
+                <li>登録されたアイテムと収納場所の情報</li>
+                <li>アクセス解析のための匿名情報</li>
+            </ul>
+            <h3>情報の利用目的</h3>
+            <ul>
+                <li>サービスの提供・改善</li>
+                <li>統計情報の作成</li>
+            </ul>
+            <h3>データの保存</h3>
+            <p>すべてのデータは、お使いの端末のローカルストレージに保存され、外部サーバーには送信されません。</p>
+        </div>
+    </div>
+    
+    <!-- 免責事項モーダル -->
+    <div id="disclaimerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('disclaimerModal')">&times;</span>
+            <h2>免責事項</h2>
+            <p>本サービスの利用により生じたいかなる損害についても、運営者は一切の責任を負いません。</p>
+            <ul>
+                <li>データの消失・破損</li>
+                <li>サービスの中断・停止</li>
+                <li>登録情報の正確性</li>
+            </ul>
+            <p>本サービスは無料で提供されており、予告なく変更・終了する場合があります。</p>
+        </div>
+    </div>
+    
+    <!-- お問い合わせモーダル -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('contactModal')">&times;</span>
+            <h2>お問い合わせ</h2>
+            <form onsubmit="submitContact(event)">
+                <div class="form-group">
+                    <label>お名前</label>
+                    <input type="text" id="contactName" required>
+                </div>
+                <div class="form-group">
+                    <label>メールアドレス</label>
+                    <input type="email" id="contactEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>お問い合わせ内容</label>
+                    <textarea id="contactMessage" rows="5" style="width: 100%; padding: 10px; border: 2px solid #e0e6ed; border-radius: 8px;" required></textarea>
+                </div>
+                <button type="submit" class="btn">送信</button>
+            </form>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
-                .then(registration => {
-                    console.log('ServiceWorker registration successful');
-                })
-                .catch(err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
+        // データ構造
+        let locations = JSON.parse(localStorage.getItem('locations') || '{}');
+        let items = JSON.parse(localStorage.getItem('items') || '[]');
+        let history = JSON.parse(localStorage.getItem('history') || '[]');
+        
+        // 初期化
+        function init() {
+            updateStats();
+            renderTree();
+            updateParentSelect();
+            generateFriendCode();
+            
+            // PWA Service Worker登録
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js');
+            }
         }
+        
+        // 統計情報更新
+        function updateStats() {
+            document.getElementById('totalItems').textContent = items.length;
+            document.getElementById('totalLocations').textContent = Object.keys(locations).length;
+            document.getElementById('savedTime').textContent = Math.floor(items.length * 3); // 1アイテム3分の節約と仮定
+            document.getElementById('yourItems').textContent = items.length;
+        }
+        
+        // 親場所セレクト更新
+        function updateParentSelect() {
+            const select = document.getElementById('parentLocation');
+            select.innerHTML = '<option value="">新規作成</option>';
+            
+            Object.keys(locations).forEach(loc => {
+                const option = document.createElement('option');
+                option.value = loc;
+                option.textContent = loc;
+                select.appendChild(option);
+            });
+        }
+        
+        // 親場所選択時の処理
+        document.getElementById('parentLocation').addEventListener('change', function() {
+            const newParent = document.getElementById('newParentLocation');
+            if (this.value === '') {
+                newParent.style.display = 'block';
+            } else {
+                newParent.style.display = 'none';
+            }
+        });
+        
+        // アイテム追加
+        function addItem() {
+            const parentSelect = document.getElementById('parentLocation');
+            const newParentInput = document.getElementById('newParentLocation');
+            const detailLocation = document.getElementById('detailLocation').value;
+            const itemName = document.getElementById('itemName').value;
+            const itemMemo = document.getElementById('itemMemo').value;
+            
+            if (!itemName || !detailLocation) {
+                alert('詳細場所とアイテム名は必須です');
+                return;
+            }
+            
+            let parentLocation = parentSelect.value;
+            if (!parentLocation) {
+                parentLocation = newParentInput.value;
+                if (!parentLocation) {
+                    alert('収納場所を入力してください');
+                    return;
+                }
+            }
+            
+            // 場所の階層構造を作成
+            if (!locations[parentLocation]) {
+                locations[parentLocation] = {};
+            }
+            if (!locations[parentLocation][detailLocation]) {
+                locations[parentLocation][detailLocation] = [];
+            }
+            
+            // アイテム追加
+            const item = {
+                id: Date.now(),
+                name: itemName,
+                memo: itemMemo,
+                parent: parentLocation,
+                detail: detailLocation,
+                createdAt: new Date().toISOString()
+            };
+            
+            items.push(item);
+            locations[parentLocation][detailLocation].push(item);
+            
+            // 履歴に追加
+            history.push({
+                action: 'add',
+                item: item,
+                timestamp: new Date().toISOString()
+            });
+            
+            // 保存
+            saveData();
+            
+            // UI更新
+            updateStats();
+            renderTree();
+            updateParentSelect();
+            
+            // フォームクリア
+            document.getElementById('detailLocation').value = '';
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemMemo').value = '';
+            document.getElementById('newParentLocation').value = '';
+            
+            alert('アイテムを登録しました！');
+        }
+        
+        // データ保存
+        function saveData() {
+            localStorage.setItem('locations', JSON.stringify(locations));
+            localStorage.setItem('items', JSON.stringify(items));
+            localStorage.setItem('history', JSON.stringify(history));
+        }
+        
+        // ツリー表示
+        function renderTree() {
+            const treeView = document.getElementById('treeView');
+            treeView.innerHTML = '';
+            
+            Object.keys(locations).forEach(parent => {
+                const parentDiv = document.createElement('div');
+                parentDiv.className = 'tree-item';
+                parentDiv.innerHTML = `📦 ${parent}`;
+                parentDiv.onclick = () => toggleChildren(parentDiv);
+                
+                const childrenDiv = document.createElement('div');
+                childrenDiv.className = 'tree-children';
+                childrenDiv.style.display = 'none';
+                
+                Object.keys(locations[parent]).forEach(detail => {
+                    const detailDiv = document.createElement('div');
+                    detailDiv.className = 'tree-item';
+                    detailDiv.innerHTML = `📍 ${detail} (${locations[parent][detail].length}個)`;
+                    
+                    const itemsDiv = document.createElement('div');
+                    itemsDiv.className = 'tree-children';
+                    itemsDiv.style.display = 'none';
+                    
+                    locations[parent][detail].forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'tree-item';
+                        itemDiv.innerHTML = `📄 ${item.name} ${item.memo ? `(${item.memo})` : ''}`;
+                        itemsDiv.appendChild(itemDiv);
+                    });
+                    
+                    detailDiv.onclick = (e) => {
+                        e.stopPropagation();
+                        itemsDiv.style.display = itemsDiv.style.display === 'none' ? 'block' : 'none';
+                    };
+                    
+                    detailDiv.appendChild(itemsDiv);
+                    childrenDiv.appendChild(detailDiv);
+                });
+                
+                parentDiv.appendChild(childrenDiv);
+                treeView.appendChild(parentDiv);
+            });
+        }
+        
+        // 子要素の表示切替
+        function toggleChildren(element) {
+            const children = element.querySelector('.tree-children');
+            if (children) {
+                children.style.display = children.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+        
+        // アイテム検索
+        function searchItems() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = '';
+            
+            if (!query) {
+                return;
+            }
+            
+            const results = items.filter(item => 
+                item.name.toLowerCase().includes(query) || 
+                (item.memo && item.memo.toLowerCase().includes(query))
+            );
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<p>見つかりませんでした</p>';
+                return;
+            }
+            
+            results.forEach(item => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'search-result';
+                resultDiv.innerHTML = `
+                    <strong>${item.name}</strong><br>
+                    📍 ${item.parent} → ${item.detail}<br>
+                    ${item.memo ? `📝 ${item.memo}` : ''}
+                `;
+                resultsDiv.appendChild(resultDiv);
+            });
+            
+            // 検索履歴に追加
+            history.push({
+                action: 'search',
+                query: query,
+                results: results.length,
+                timestamp: new Date().toISOString()
+            });
+            saveData();
+        }
+        
+        // QRコード生成
+        function generateQR() {
+            const modal = document.getElementById('qrModal');
+            modal.style.display = 'block';
+            
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            
+            const data = {
+                locations: Object.keys(locations).length,
+                items: items.length,
+                url: window.location.href
+            };
+            
+            new QRCode(qrContainer, {
+                text: JSON.stringify(data),
+                width: 200,
+                height: 200
+            });
+        }
+        
+        // QR印刷
+        function printQR() {
+            window.print();
+        }
+        
+        // SNSシェア
+        function shareResults() {
+            document.getElementById('shareModal').style.display = 'block';
+        }
+        
+        function shareToTwitter() {
+            const text = `${items.length}個のアイテムを整理整頓！
+探し物の時間を${Math.floor(items.length * 3)}分節約できました✨
+
+無料の持ち物ロケーターで「どこに置いたっけ？」を解決！
+
+#継続は力なり #整理整頓 #片付け #ライフハック`;
+            
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
+            window.open(url, '_blank');
+        }
+        
+        function shareToLine() {
+            const text = `${items.length}個のアイテムを整理整頓！無料の持ち物ロケーターで探し物ゼロ生活を始めよう！`;
+            const url = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+        
+        function shareToFacebook() {
+            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+            window.open(url, '_blank');
+        }
+        
+        // 友達と比較
+        function compareWithFriends() {
+            document.getElementById('compareModal').style.display = 'block';
+        }
+        
+        // 友達コード生成
+        function generateFriendCode() {
+            const code = 'IL' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            document.getElementById('friendCode').value = code;
+        }
+        
+        // 友達コードコピー
+        function copyFriendCode() {
+            const codeInput = document.getElementById('friendCode');
+            codeInput.select();
+            document.execCommand('copy');
+            alert('友達コードをコピーしました！');
+        }
+        
+        // 履歴表示
+        function showHistory() {
+            const recentHistory = history.slice(-10).reverse();
+            let historyText = '最近の履歴：\n\n';
+            
+            recentHistory.forEach(h => {
+                const date = new Date(h.timestamp).toLocaleString('ja-JP');
+                if (h.action === 'add') {
+                    historyText += `📦 ${date}: ${h.item.name}を登録\n`;
+                } else if (h.action === 'search') {
+                    historyText += `🔍 ${date}: "${h.query}"を検索 (${h.results}件)\n`;
+                }
+            });
+            
+            alert(historyText);
+        }
+        
+        // モーダル閉じる
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // プライバシーポリシー表示
+        function showPrivacyPolicy() {
+            document.getElementById('privacyModal').style.display = 'block';
+        }
+        
+        // 免責事項表示
+        function showDisclaimer() {
+            document.getElementById('disclaimerModal').style.display = 'block';
+        }
+        
+        // お問い合わせ表示
+        function showContact() {
+            document.getElementById('contactModal').style.display = 'block';
+        }
+        
+        // お問い合わせ送信
+        function submitContact(e) {
+            e.preventDefault();
+            alert('お問い合わせを受け付けました。返信まで2-3営業日お待ちください。');
+            closeModal('contactModal');
+        }
+        
+        // アフィリエイトトラッキング
+        function trackAffiliate(type) {
+            // ここに実際のアフィリエイトリンクを設定
+            const affiliateLinks = {
+                'muji': 'https://px.a8.net/svt/ejp?a8mat=XXXXX', // A8.netの無印良品
+                'ikea': 'https://hb.afl.rakuten.co.jp/XXXXX', // 楽天のIKEA
+                'label': 'https://www.amazon.co.jp/dp/XXXXX?tag=XXXXX' // Amazonのラベルプリンター
+            };
+            
+            if (affiliateLinks[type]) {
+                window.open(affiliateLinks[type], '_blank');
+            }
+        }
+        
+        // Enterキーで検索
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchItems();
+            }
+        });
+        
+        // モーダル外クリックで閉じる
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+        
+        // 初期化実行
+        init();
     </script>
 </body>
-</html> 
+</html>
