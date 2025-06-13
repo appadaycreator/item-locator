@@ -28,26 +28,55 @@
                 return;
             }
 
-            const iconMap = {
-                'キッチン': 'fa-utensils',
-                'リビング': 'fa-couch',
-                '寝室': 'fa-bed',
-                '玄関': 'fa-door-closed',
-                'バスルーム': 'fa-bath'
-            };
+            function buildTree(items) {
+                const root = {};
+                items.forEach(item => {
+                    const path = item.locationPath && item.locationPath.length ? item.locationPath : [item.parent, item.detail].filter(Boolean);
+                    let node = root;
+                    path.forEach((p, idx) => {
+                        if (!node[p]) node[p] = { items: [], children: {} };
+                        if (idx === path.length - 1) {
+                            node[p].items.push(item);
+                        }
+                        node = node[p].children;
+                    });
+                });
+                return root;
+            }
 
-            const map = {};
-            items.forEach(item => {
-                if (!map[item.parent]) map[item.parent] = {};
-                if (!map[item.parent][item.detail]) map[item.parent][item.detail] = [];
-                map[item.parent][item.detail].push(item);
-            });
+            function renderTree(node, container, level = 0, prefix = '') {
+                for (const [name, data] of Object.entries(node)) {
+                    const div = document.createElement('div');
+                    div.className = level === 0 ? 'bg-white p-4 rounded-lg shadow flex flex-col gap-2 mb-4' : 'border border-gray-200 rounded p-2 ml-4 mt-2';
+                    div.id = level === 0 ? 'sec-' + name : prefix + name;
+                    const title = document.createElement('div');
+                    title.className = level === 0 ? 'font-bold text-lg' : 'font-medium mb-1';
+                    title.textContent = name;
+                    div.appendChild(title);
+                    if (data.items.length) {
+                        const ul = document.createElement('ul');
+                        ul.className = 'list-disc ml-4 text-gray-700';
+                        data.items.forEach(it => {
+                            const li = document.createElement('li');
+                            li.textContent = it.name;
+                            ul.appendChild(li);
+                        });
+                        div.appendChild(ul);
+                    }
+                    if (Object.keys(data.children).length) {
+                        renderTree(data.children, div, level + 1, (prefix + name + '-'));
+                    }
+                    container.appendChild(div);
+                }
+            }
+
+            const tree = buildTree(items);
 
             floor.innerHTML = '';
-            Object.keys(map).forEach(parent => {
+            Object.keys(tree).forEach(parent => {
                 const cell = document.createElement('div');
                 cell.className = 'flex flex-col items-center p-4 bg-white rounded-lg shadow cursor-pointer hover:bg-blue-50';
-                cell.innerHTML = `<i class="fas ${iconMap[parent] || 'fa-box-open'} text-2xl mb-2"></i><span>${parent}</span>`;
+                cell.innerHTML = `<i class="fas fa-box-open text-2xl mb-2"></i><span>${parent}</span>`;
                 cell.addEventListener('click', () => {
                     const section = document.getElementById('sec-' + parent);
                     if (section) section.scrollIntoView({ behavior: 'smooth' });
@@ -55,34 +84,8 @@
                 floor.appendChild(cell);
             });
 
-            for (const [parent, details] of Object.entries(map)) {
-                const parentDiv = document.createElement('div');
-                parentDiv.className = 'bg-white p-4 rounded-lg shadow flex flex-col gap-2';
-                parentDiv.id = 'sec-' + parent;
-                const parentTitle = document.createElement('div');
-                parentTitle.innerHTML = `<i class="fas ${iconMap[parent] || 'fa-box-open'} mr-2"></i>${parent}`;
-                parentTitle.className = 'font-bold text-lg';
-                parentDiv.appendChild(parentTitle);
-
-                for (const [detail, list] of Object.entries(details)) {
-                    const detailDiv = document.createElement('div');
-                    detailDiv.className = 'border border-gray-200 rounded p-2';
-                    const detailTitle = document.createElement('div');
-                    detailTitle.textContent = detail;
-                    detailTitle.className = 'font-medium mb-1';
-                    detailDiv.appendChild(detailTitle);
-                    const ul = document.createElement('ul');
-                    ul.className = 'list-disc ml-4 text-gray-700';
-                    list.forEach(it => {
-                        const li = document.createElement('li');
-                        li.textContent = it.name;
-                        ul.appendChild(li);
-                    });
-                    detailDiv.appendChild(ul);
-                    parentDiv.appendChild(detailDiv);
-                }
-                container.appendChild(parentDiv);
-            }
+            container.innerHTML = '';
+            renderTree(tree, container);
         }
         document.addEventListener('DOMContentLoaded', renderMap);
     </script>

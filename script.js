@@ -23,9 +23,25 @@ function updateLocationOptions() {
     locations.map(l => `<option>${l}</option>`).join('');
 }
 
+function formatLocation(item) {
+  if (item.locationPath && item.locationPath.length) {
+    return item.locationPath.join(' > ');
+  }
+  return [item.parent, item.detail].filter(Boolean).join(' > ');
+}
+
 function loadItems() {
   const data = JSON.parse(localStorage.getItem(ITEM_KEY) || '[]');
-  return data.map(i => ({ ...i, searchCount: i.searchCount || 0 }));
+  return data.map(i => {
+    const item = { ...i, searchCount: i.searchCount || 0 };
+    if (!item.locationPath) {
+      const path = [];
+      if (item.parent) path.push(item.parent);
+      if (item.detail) path.push(item.detail);
+      item.locationPath = path;
+    }
+    return item;
+  });
 }
 
 function saveItems(items) {
@@ -36,7 +52,7 @@ function updateDashboard() {
   const items = loadItems();
   const itemCountEl = document.getElementById('itemCount');
   if (itemCountEl) itemCountEl.textContent = items.length;
-  const locations = new Set(items.map(i => i.parent));
+  const locations = new Set(items.map(i => (i.locationPath && i.locationPath[0]) || i.parent));
   const locationCountEl = document.getElementById('locationCount');
   if (locationCountEl) locationCountEl.textContent = locations.size;
 
@@ -57,7 +73,7 @@ function renderResults(results) {
       img.className = 'w-16 h-16 object-cover rounded';
       div.appendChild(img);
     }
-    info.innerHTML = `<span>${item.name} - ${item.parent} ${item.detail}</span>`;
+    info.innerHTML = `<span>${item.name} - ${formatLocation(item)}</span>`;
     div.appendChild(info);
     container.appendChild(div);
   });
@@ -67,7 +83,7 @@ function search(query) {
   const items = loadItems();
   const keywords = query.trim().toLowerCase().split(/\s+/);
   const results = items.filter(item => {
-    const text = [item.name, item.memo, item.parent, item.detail, item.tags.join(' ')].join(' ').toLowerCase();
+    const text = [item.name, item.memo, formatLocation(item), item.tags.join(' ')].join(' ').toLowerCase();
     return keywords.every(k => text.includes(k));
   });
   results.forEach(item => {
@@ -139,8 +155,17 @@ function handlePhoto(file) {
 function saveItem() {
   const name = document.getElementById('itemName').value.trim();
   if (!name) return alert('アイテム名を入力してください');
-  const parent = document.getElementById('parentLocation').value;
-  const detail = document.getElementById('detailLocation').value.trim();
+  let parent = document.getElementById('parentLocation').value;
+  let detail = document.getElementById('detailLocation').value.trim();
+  const pathInput = document.getElementById('locationPath');
+  let locationPath = [];
+  if (pathInput && pathInput.value.trim()) {
+    locationPath = pathInput.value.trim().split('/').map(s => s.trim()).filter(Boolean);
+    parent = locationPath[0] || parent;
+    detail = locationPath[1] || detail;
+  } else {
+    locationPath = [parent, detail].filter(Boolean);
+  }
   const tags = document.getElementById('itemTags').value.trim().split(/\s+/).filter(Boolean);
   const memo = document.getElementById('itemMemo').value.trim();
   const favorite = document.getElementById('favorite').checked;
@@ -152,6 +177,7 @@ function saveItem() {
     name,
     parent,
     detail,
+    locationPath,
     tags,
     memo,
     favorite,
@@ -170,6 +196,7 @@ function saveItem() {
   document.getElementById('itemTags').value = '';
   document.getElementById('parentLocation').selectedIndex = 0;
   document.getElementById('detailLocation').value = '';
+  if (pathInput) pathInput.value = '';
   document.getElementById('itemMemo').value = '';
   document.getElementById('favorite').checked = false;
   photoData = '';
@@ -186,18 +213,18 @@ function editItem(id) {
   if (!item) return;
   const name = prompt('アイテム名', item.name);
   if (name === null) return;
-  const parent = prompt('場所', item.parent);
-  if (parent === null) return;
-  const detail = prompt('詳細', item.detail);
-  if (detail === null) return;
+  const loc = prompt('階層場所(/区切り)', (item.locationPath || [item.parent, item.detail]).join('/'));
+  if (loc === null) return;
+  const locPath = loc.split('/').map(s => s.trim()).filter(Boolean);
   const memo = prompt('メモ', item.memo);
   if (memo === null) return;
   const tags = prompt('タグ(スペース区切り)', item.tags.join(' '));
   if (tags === null) return;
 
   item.name = name.trim();
-  item.parent = parent.trim();
-  item.detail = detail.trim();
+  item.locationPath = locPath;
+  item.parent = locPath[0] || '';
+  item.detail = locPath[1] || '';
   item.memo = memo.trim();
   item.tags = tags.trim().split(/\s+/).filter(Boolean);
   saveItems(items);

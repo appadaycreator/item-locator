@@ -36,7 +36,7 @@
                     div.appendChild(img);
                 }
                 const info = document.createElement('div');
-                info.innerHTML = `<div class="font-medium">${item.name}</div><div class="text-sm text-gray-600">${item.parent} ${item.detail}</div>`;
+                info.innerHTML = `<div class="font-medium">${item.name}</div><div class="text-sm text-gray-600">${formatLocation(item)}</div>`;
                 div.appendChild(info);
 
                 const controls = document.createElement('div');
