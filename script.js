@@ -49,7 +49,7 @@ function initFontSizeControl() {
 function loadRooms() {
   const data = localStorage.getItem(ROOM_KEY);
   if (data) return JSON.parse(data);
-  const defaults = ['リビング', '寝室', 'キッチン'];
+  const defaults = ['リビング', '寝室', 'キッチン', '書斎'];
   localStorage.setItem(ROOM_KEY, JSON.stringify(defaults));
   return defaults;
 }
