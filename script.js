@@ -29,7 +29,6 @@ function updateDashboard() {
   document.getElementById('itemCount').textContent = items.length;
   const locations = new Set(items.map(i => i.parent));
   document.getElementById('locationCount').textContent = locations.size;
-  document.getElementById('timeSaved').textContent = items.length * 5;
 
   const now = new Date();
   const month = now.getMonth();
