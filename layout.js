@@ -78,13 +78,19 @@ function initLayout() {
   container.innerHTML = '';
   rooms.forEach(room => {
     if (filterRoom && room !== filterRoom) return;
+    const hasLoc = locations.some(l => l.room === room);
     const div = document.createElement('div');
-    div.className = 'room border border-gray-300 bg-white rounded relative';
     div.dataset.room = room;
-    const title = document.createElement('div');
-    title.textContent = room;
-    title.className = 'bg-gray-100 text-sm px-2 py-1';
-    div.appendChild(title);
+    if (hasLoc) {
+      div.className = 'room border border-gray-300 bg-white rounded relative';
+      const title = document.createElement('div');
+      title.textContent = room;
+      title.className = 'bg-gray-100 text-sm px-2 py-1';
+      div.appendChild(title);
+    } else {
+      div.className = 'room empty border border-gray-300 bg-white rounded text-sm';
+      div.textContent = room;
+    }
     container.appendChild(div);
   });
   locations.forEach(loc => {
@@ -94,4 +100,8 @@ function initLayout() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', initLayout);
+document.addEventListener('DOMContentLoaded', () => {
+  initLayout();
+  const btn = document.getElementById('addLocationBtn');
+  if (btn) btn.addEventListener('click', () => setTimeout(initLayout, 0));
+});
