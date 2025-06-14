@@ -134,14 +134,21 @@
     <script src="script.js"></script>
     <script src="header.js"></script>
     <script>
-        function renderAllItems(query = '') {
+        function renderAllItems(query = '', loc = '') {
             const container = document.getElementById('itemsList');
             const items = loadItems();
             const keywords = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
-            const filtered = keywords.length ? items.filter(item => {
-                const text = [item.name, item.memo, formatLocation(item), item.tags.join(' ')].join(' ').toLowerCase();
-                return keywords.every(k => text.includes(k));
-            }) : items;
+            let filtered = items;
+            if (loc) {
+                const parts = loc.split('/');
+                filtered = filtered.filter(item => parts.every((p, i) => item.locationPath[i] === p));
+            }
+            if (keywords.length) {
+                filtered = filtered.filter(item => {
+                    const text = [item.name, item.memo, formatLocation(item), item.tags.join(' ')].join(' ').toLowerCase();
+                    return keywords.every(k => text.includes(k));
+                });
+            }
             container.innerHTML = '';
             if (filtered.length === 0) {
                 container.innerHTML = '<p class="text-gray-600">該当するアイテムがありません。</p>';
@@ -181,12 +188,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(location.search);
             const q = params.get('q') || '';
+            const loc = params.get('loc') || '';
             const input = document.getElementById('itemsSearchInput');
             if (input) {
                 input.value = q;
-                input.addEventListener('input', e => renderAllItems(e.target.value));
+                input.addEventListener('input', e => renderAllItems(e.target.value, loc));
             }
-            renderAllItems(q);
+            renderAllItems(q, loc);
         });
     </script>
 </body>

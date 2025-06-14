@@ -17,6 +17,10 @@ async function loadCommonHeader() {
     }
   }
   initFontSizeControl();
+  const headerElem = document.querySelector('header');
+  if (headerElem) {
+    document.body.style.paddingTop = headerElem.offsetHeight + 'px';
+  }
   const toggle = document.getElementById('menuToggle');
   const menu = document.getElementById('navMenu');
   if (toggle && menu) {
