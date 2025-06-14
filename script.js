@@ -4,6 +4,7 @@ const LOCATION_KEY = 'locations';
 
 let photoData = '';
 let editingItemId = null;
+let editingLocationIndex = null;
 
 const FONT_SIZE_KEY = 'fontSize';
 const DEFAULT_FONT_SIZE = '16';
@@ -88,7 +89,8 @@ function saveLocations(locations) {
 function updateRoomOptions() {
   const selects = [
     document.getElementById('roomSelect'),
-    document.getElementById('locationRoomSelect')
+    document.getElementById('locationRoomSelect'),
+    document.getElementById('editLocationRoom')
   ].filter(Boolean);
   if (selects.length === 0) return;
   const rooms = loadRooms();
@@ -469,13 +471,13 @@ function renderLocations() {
     const span = document.createElement('span');
     span.textContent = `${loc.room} - ${loc.name}`;
     span.classList.add('cursor-pointer');
-    span.addEventListener('click', () => editLocation(i));
+    span.addEventListener('click', () => startEditLocation(i));
     div.appendChild(span);
     const controls = document.createElement('div');
     controls.className = 'flex gap-2';
     const editBtn = document.createElement('button');
     editBtn.innerHTML = '<i class="fas fa-edit text-blue-500"></i>';
-    editBtn.addEventListener('click', () => editLocation(i));
+    editBtn.addEventListener('click', () => startEditLocation(i));
     const delBtn = document.createElement('button');
     delBtn.innerHTML = '<i class="fas fa-trash-alt text-red-500"></i>';
     delBtn.addEventListener('click', () => deleteLocation(i));
@@ -503,15 +505,32 @@ function addLocation() {
   updateLocationOptions(room);
 }
 
-function editLocation(index) {
+function startEditLocation(index) {
   const locations = loadLocations();
   const loc = locations[index];
-  const rooms = loadRooms();
+  const form = document.getElementById('editLocationForm');
+  const roomSelect = document.getElementById('editLocationRoom');
+  const nameInput = document.getElementById('editLocationName');
+  if (!form || !roomSelect || !nameInput) return;
+  editingLocationIndex = index;
+  updateRoomOptions();
+  roomSelect.value = loc.room;
+  nameInput.value = loc.name;
+  form.classList.remove('hidden');
+}
 
-  let room = prompt('収納部屋', loc.room);
-  if (room === null) return;
-  room = room.trim();
-  if (!room) return;
+function saveEditLocation() {
+  if (editingLocationIndex === null) return;
+  const locations = loadLocations();
+  const loc = locations[editingLocationIndex];
+  const rooms = loadRooms();
+  const roomSelect = document.getElementById('editLocationRoom');
+  const nameInput = document.getElementById('editLocationName');
+  if (!roomSelect || !nameInput) return;
+  const room = roomSelect.value;
+  const name = nameInput.value.trim();
+  if (!room) return alert('部屋を選択してください');
+  if (!name) return alert('収納場所名を入力してください');
   if (!rooms.includes(room)) {
     if (confirm(`${room} を新しい部屋として追加しますか？`)) {
       rooms.push(room);
@@ -520,16 +539,21 @@ function editLocation(index) {
       return;
     }
   }
-
-  const name = prompt('収納場所名', loc.name);
-  if (name === null) return;
-
   loc.room = room;
-  loc.name = name.trim();
+  loc.name = name;
   saveLocations(locations);
+  const form = document.getElementById('editLocationForm');
+  if (form) form.classList.add('hidden');
+  editingLocationIndex = null;
   renderLocations();
   updateRoomOptions();
   updateLocationOptions(room);
+}
+
+function cancelEditLocation() {
+  editingLocationIndex = null;
+  const form = document.getElementById('editLocationForm');
+  if (form) form.classList.add('hidden');
 }
 
 function deleteLocation(index) {
@@ -537,6 +561,13 @@ function deleteLocation(index) {
   const locations = loadLocations();
   const loc = locations.splice(index, 1)[0];
   saveLocations(locations);
+  if (editingLocationIndex !== null) {
+    if (editingLocationIndex === index) {
+      cancelEditLocation();
+    } else if (editingLocationIndex > index) {
+      editingLocationIndex--;
+    }
+  }
   renderLocations();
   updateLocationOptions(loc.room);
 }
@@ -554,6 +585,10 @@ window.addEventListener('DOMContentLoaded', () => {
   if (roomSelect) roomSelect.addEventListener('change', e => updateLocationOptions(e.target.value));
   const addLocBtn = document.getElementById('addLocationBtn');
   if (addLocBtn) addLocBtn.addEventListener('click', addLocation);
+  const saveEditLocBtn = document.getElementById('saveEditLocationBtn');
+  if (saveEditLocBtn) saveEditLocBtn.addEventListener('click', saveEditLocation);
+  const cancelEditLocBtn = document.getElementById('cancelEditLocationBtn');
+  if (cancelEditLocBtn) cancelEditLocBtn.addEventListener('click', cancelEditLocation);
   const searchBtn = document.getElementById('searchBtn');
   if (searchBtn) {
     searchBtn.addEventListener('click', () => {
