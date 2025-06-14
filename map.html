@@ -76,8 +76,8 @@
                 cell.className = 'flex flex-col items-center p-4 bg-white rounded-lg shadow cursor-pointer hover:bg-blue-50';
                 cell.innerHTML = `<i class="fas fa-box-open text-2xl mb-2"></i><span>${parent}</span>`;
                 cell.addEventListener('click', () => {
-                    const section = document.getElementById('sec-' + parent);
-                    if (section) section.scrollIntoView({ behavior: 'smooth' });
+                    const room = encodeURIComponent(parent);
+                    location.href = `layout.html?room=${room}`;
                 });
                 floor.appendChild(cell);
             });
