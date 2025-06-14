@@ -85,11 +85,16 @@ function saveLocations(locations) {
 }
 
 function updateRoomOptions() {
-  const select = document.getElementById('roomSelect');
-  if (!select) return;
+  const selects = [
+    document.getElementById('roomSelect'),
+    document.getElementById('locationRoomSelect')
+  ].filter(Boolean);
+  if (selects.length === 0) return;
   const rooms = loadRooms();
-  select.innerHTML = '<option>選択してください</option>' +
-    rooms.map(r => `<option>${r}</option>`).join('');
+  selects.forEach(select => {
+    select.innerHTML = '<option>選択してください</option>' +
+      rooms.map(r => `<option>${r}</option>`).join('');
+  });
 }
 
 function updateLocationOptions(room) {
