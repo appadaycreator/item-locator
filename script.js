@@ -479,7 +479,6 @@ function deleteLocation(index) {
 
 window.addEventListener('DOMContentLoaded', () => {
   applyFontSize(loadFontSize());
-  initFontSizeControl();
   updateDashboard();
   updateRoomOptions();
   const roomSelect = document.getElementById('roomSelect');
