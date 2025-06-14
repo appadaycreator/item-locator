@@ -468,6 +468,8 @@ function renderLocations() {
     div.className = 'p-3 bg-white rounded-lg shadow flex items-center justify-between';
     const span = document.createElement('span');
     span.textContent = `${loc.room} - ${loc.name}`;
+    span.classList.add('cursor-pointer');
+    span.addEventListener('click', () => editLocation(i));
     div.appendChild(span);
     const controls = document.createElement('div');
     controls.className = 'flex gap-2';
