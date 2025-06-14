@@ -20,6 +20,120 @@
         </form>
     </header>
     <div id="itemsList" class="space-y-3"></div>
+
+    <!-- 編集フォーム -->
+    <div id="itemForm" class="bg-white p-6 rounded-lg custom-shadow mb-8 hidden">
+        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+            <i class="fas fa-edit mr-2 text-blue-600"></i>
+            アイテム登録フォーム
+        </h2>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <!-- 写真アップロード -->
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">
+                        <i class="fas fa-camera mr-2"></i>写真
+                    </label>
+                    <label id="photoDrop" class="block w-full cursor-pointer border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition">
+                        <input type="file" id="itemPhoto" accept="image/*" capture="environment" class="hidden">
+                        <div id="photoPreview" class="flex flex-col items-center justify-center">
+                            <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-2"></i>
+                            <p class="text-gray-600">クリックまたはドラッグ＆ドロップで画像を追加</p>
+                            <p class="text-gray-400 text-sm mt-1">写真があると探しやすくなります！</p>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- アイテム名 -->
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">
+                        <i class="fas fa-box mr-2"></i>アイテム名 *
+                    </label>
+                    <input id="itemName" type="text" placeholder="例：MacBookの充電器"
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+
+                <!-- タグ -->
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">
+                        <i class="fas fa-tags mr-2"></i>タグ（スペース区切り）
+                    </label>
+                    <input id="itemTags" type="text" placeholder="例：電子機器 充電器 Apple"
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <!-- 収納部屋 -->
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">
+                        <i class="fas fa-door-closed mr-2"></i>収納部屋
+                    </label>
+                    <select id="roomSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option>選択してください</option>
+                    </select>
+                </div>
+                <!-- 収納場所 -->
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">
+                        <i class="fas fa-home mr-2"></i>収納場所
+                    </label>
+                    <select id="parentLocation" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option>選択してください</option>
+                    </select>
+                </div>
+
+                <!-- 詳細場所 -->
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">
+                        <i class="fas fa-map-pin mr-2"></i>詳細場所
+                    </label>
+                <input id="detailLocation" type="text" placeholder="例：テレビ台の引き出し 左上"
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+
+                <!-- 階層場所 -->
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">
+                        <i class="fas fa-sitemap mr-2"></i>階層場所 (/ 区切り)
+                    </label>
+                    <input id="locationPath" type="text" placeholder="例：押入れ/ダンボール①/服"
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <p class="text-gray-500 text-sm mt-1">上から順にスラッシュで区切ります</p>
+                </div>
+
+                <!-- メモ -->
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">
+                        <i class="fas fa-sticky-note mr-2"></i>メモ
+                    </label>
+                    <textarea id="itemMemo" placeholder="その他の詳細情報..." rows="3"
+                              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                </div>
+
+                <!-- お気に入り -->
+                <div class="flex items-center">
+                    <input type="checkbox" id="favorite" class="mr-2">
+                    <label for="favorite" class="text-gray-700 flex items-center">
+                        <i class="fas fa-star mr-2 text-yellow-500"></i>
+                        お気に入りに追加
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 flex gap-4">
+            <button id="saveItem" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-medium">
+                <i class="fas fa-save mr-2"></i>
+                保存
+            </button>
+            <button id="cancelItem" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition font-medium">
+                <i class="fas fa-times mr-2"></i>
+                キャンセル
+            </button>
+        </div>
+    </div>
     <script src="script.js"></script>
     <script src="header.js"></script>
     <script>

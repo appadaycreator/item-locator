@@ -3,6 +3,7 @@ const ROOM_KEY = 'rooms';
 const LOCATION_KEY = 'locations';
 
 let photoData = '';
+let editingItemId = null;
 
 const FONT_SIZE_KEY = 'fontSize';
 const DEFAULT_FONT_SIZE = '16';
@@ -300,20 +301,35 @@ function saveItem() {
   const image = photoData;
 
   const items = loadItems();
-  items.push({
-    id: Date.now(),
-    name,
-    room,
-    location: parent,
-    detail,
-    locationPath,
-    tags,
-    memo,
-    favorite,
-    image,
-    createdAt: new Date().toISOString(),
-    searchCount: 0
-  });
+  if (editingItemId !== null) {
+    const item = items.find(i => i.id === editingItemId);
+    if (item) {
+      item.name = name;
+      item.room = room;
+      item.location = parent;
+      item.detail = detail;
+      item.locationPath = locationPath;
+      item.tags = tags;
+      item.memo = memo;
+      item.favorite = favorite;
+      item.image = image;
+    }
+  } else {
+    items.push({
+      id: Date.now(),
+      name,
+      room,
+      location: parent,
+      detail,
+      locationPath,
+      tags,
+      memo,
+      favorite,
+      image,
+      createdAt: new Date().toISOString(),
+      searchCount: 0
+    });
+  }
   try {
     saveItems(items);
   } catch (e) {
@@ -321,6 +337,7 @@ function saveItem() {
     return;
   }
   updateDashboard();
+  if (typeof renderAllItems === 'function') renderAllItems();
   document.getElementById('itemName').value = '';
   document.getElementById('itemTags').value = '';
   document.getElementById('parentLocation').selectedIndex = 0;
@@ -333,33 +350,43 @@ function saveItem() {
   if (preview) {
     preview.innerHTML = '<i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-2"></i><p class="text-gray-600">クリックまたはドラッグ＆ドロップで画像を追加</p><p class="text-gray-400 text-sm mt-1">写真があると探しやすくなります！</p>';
   }
-  alert('アイテムを保存しました');
+  const msg = editingItemId !== null ? 'アイテムを更新しました' : 'アイテムを保存しました';
+  alert(msg);
+  editingItemId = null;
+  const saveBtn = document.getElementById('saveItem');
+  if (saveBtn) saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i>保存';
 }
 
 function editItem(id) {
   const items = loadItems();
   const item = items.find(i => i.id === id);
   if (!item) return;
-  const name = prompt('アイテム名', item.name);
-  if (name === null) return;
-  const loc = prompt('階層場所(/区切り)', (item.locationPath || [item.room, item.location, item.detail]).join('/'));
-  if (loc === null) return;
-  const locPath = loc.split('/').map(s => s.trim()).filter(Boolean);
-  const memo = prompt('メモ', item.memo);
-  if (memo === null) return;
-  const tags = prompt('タグ(スペース区切り)', item.tags.join(' '));
-  if (tags === null) return;
-
-  item.name = name.trim();
-  item.locationPath = locPath;
-  item.room = locPath[0] || '';
-  item.location = locPath[1] || '';
-  item.detail = locPath[2] || '';
-  item.memo = memo.trim();
-  item.tags = tags.trim().split(/\s+/).filter(Boolean);
-  saveItems(items);
-  updateDashboard();
-  if (typeof renderAllItems === 'function') renderAllItems();
+  editingItemId = id;
+  const form = document.getElementById('itemForm');
+  if (form) form.classList.remove('hidden');
+  const saveBtn = document.getElementById('saveItem');
+  if (saveBtn) saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i>更新';
+  document.getElementById('itemName').value = item.name;
+  document.getElementById('itemTags').value = item.tags.join(' ');
+  updateRoomOptions();
+  document.getElementById('roomSelect').value = item.room || '選択してください';
+  updateLocationOptions(item.room);
+  document.getElementById('parentLocation').value = item.location || '選択してください';
+  document.getElementById('detailLocation').value = item.detail || '';
+  const pathInput = document.getElementById('locationPath');
+  if (pathInput) pathInput.value = (item.locationPath || []).join('/');
+  document.getElementById('itemMemo').value = item.memo || '';
+  document.getElementById('favorite').checked = !!item.favorite;
+  if (item.image) {
+    photoData = item.image;
+    const preview = document.getElementById('photoPreview');
+    if (preview) {
+      preview.innerHTML = `<img src="${photoData}" class="mx-auto mb-2 max-h-40 rounded-lg max-w-full" alt="preview">`;
+    }
+  } else {
+    photoData = '';
+  }
+  form.scrollIntoView({ behavior: 'smooth' });
 }
 
 function deleteItem(id) {
@@ -572,6 +599,9 @@ window.addEventListener('DOMContentLoaded', () => {
   if (cancelBtn && form) {
     cancelBtn.addEventListener('click', () => {
       form.classList.add('hidden');
+      editingItemId = null;
+      const saveBtn = document.getElementById('saveItem');
+      if (saveBtn) saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i>保存';
     });
   }
 
