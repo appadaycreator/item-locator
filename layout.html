@@ -9,11 +9,19 @@
     <style>
         body { background: #f5f7fa; }
         .room { width: 300px; height: 200px; }
+        .room.empty { width: 150px; height: 50px; display:flex; align-items:center; justify-content:center; }
         .location { width: 80px; height: 40px; touch-action: none; }
     </style>
 </head>
 <body class="p-6">
     <!-- ヘッダーは共通テンプレートから読み込み -->
+    <div class="mb-4 flex flex-col gap-2 sm:flex-row">
+        <select id="locationRoomSelect" class="p-2 border border-gray-300 rounded-lg">
+            <option>部屋を選択</option>
+        </select>
+        <input id="newLocationName" type="text" placeholder="収納場所名" class="p-2 border border-gray-300 rounded-lg flex-grow">
+        <button id="addLocationBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">追加</button>
+    </div>
     <div id="layout" class="flex flex-wrap gap-6"></div>
     <script src="script.js"></script>
     <script src="layout.js"></script>
