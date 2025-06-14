@@ -21,10 +21,8 @@ function saveFontSize(size) {
 
 function initFontSizeControl() {
   const containers = [];
-  const desktop = document.getElementById('desktopFontSize');
-  const mobile = document.getElementById('mobileFontSize');
-  if (desktop) containers.push(desktop);
-  if (mobile) containers.push(mobile);
+  const target = document.getElementById('fontSize');
+  if (target) containers.push(target);
   if (containers.length === 0) {
     const header = document.querySelector('header');
     if (header) containers.push(header);
