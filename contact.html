@@ -92,9 +92,10 @@
         const name = document.getElementById('contactName').value;
         const email = document.getElementById('contactEmail').value;
         const message = document.getElementById('contactMessage').value;
-        const subject = encodeURIComponent('お問い合わせ');
+        const title = encodeURIComponent(`お問い合わせ: ${name}`);
         const body = encodeURIComponent(`お名前: ${name}\nメール: ${email}\n\n${message}`);
-        window.location.href = `mailto:appadaycreator@example.com?subject=${subject}&body=${body}`;
+        const url = `https://github.com/appadaycreator/item-locator/issues/new?title=${title}&body=${body}`;
+        window.open(url, '_blank');
       });
     </script>
 </body>

@@ -102,7 +102,7 @@ MITライセンスのもとで公開されています。詳細は[LICENSE](LICE
 
 - Twitter: [@appadaycreator](https://twitter.com/appadaycreator)
 - Issues: [GitHub Issues](https://github.com/appadaycreator/item-locator/issues)
-- Webフォーム: [お問い合わせページ](contact.html)
+- Webフォーム: [お問い合わせページ](contact.html) (GitHub Issue を自動生成)
 
 ---
 
