@@ -12,6 +12,7 @@ function createLocationBox(loc, roomDiv) {
   box.style.top = loc.y + 'px';
   roomDiv.appendChild(box);
 
+  let moved = false;
   function startDrag(startX, startY, isTouch) {
     const origX = loc.x;
     const origY = loc.y;
@@ -28,6 +29,7 @@ function createLocationBox(loc, roomDiv) {
       box.style.top = y + 'px';
       loc.x = x;
       loc.y = y;
+      moved = true;
     }
     function endMove() {
       document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onMove);
@@ -40,13 +42,22 @@ function createLocationBox(loc, roomDiv) {
 
   box.addEventListener('mousedown', e => {
     e.preventDefault();
+    moved = false;
     startDrag(e.clientX, e.clientY, false);
   });
 
   box.addEventListener('touchstart', e => {
     e.preventDefault();
     const t = e.touches[0];
+    moved = false;
     startDrag(t.clientX, t.clientY, true);
+  });
+
+  box.addEventListener('click', () => {
+    if (!moved) {
+      const path = encodeURIComponent(`${loc.room}/${loc.name}`);
+      location.href = `items.html?loc=${path}`;
+    }
   });
 }
 
@@ -54,6 +65,12 @@ function initLayout() {
   const container = document.getElementById('layout');
   const rooms = loadRooms();
   const locations = loadLocations();
+  rooms.sort((a, b) => {
+    const hasA = locations.some(l => l.room === a);
+    const hasB = locations.some(l => l.room === b);
+    if (hasA === hasB) return 0;
+    return hasA ? -1 : 1;
+  });
   window.layoutLocations = locations;
   container.innerHTML = '';
   rooms.forEach(room => {
