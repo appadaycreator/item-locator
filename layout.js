@@ -62,6 +62,9 @@ function createLocationBox(loc, roomDiv) {
 }
 
 function initLayout() {
+  const params = new URLSearchParams(location.search);
+  const filterRoom = params.get('room');
+
   const container = document.getElementById('layout');
   const rooms = loadRooms();
   const locations = loadLocations();
@@ -74,6 +77,7 @@ function initLayout() {
   window.layoutLocations = locations;
   container.innerHTML = '';
   rooms.forEach(room => {
+    if (filterRoom && room !== filterRoom) return;
     const div = document.createElement('div');
     div.className = 'room border border-gray-300 bg-white rounded relative';
     div.dataset.room = room;
@@ -84,6 +88,7 @@ function initLayout() {
     container.appendChild(div);
   });
   locations.forEach(loc => {
+    if (filterRoom && loc.room !== filterRoom) return;
     const roomDiv = container.querySelector(`.room[data-room="${loc.room}"]`);
     if (roomDiv) createLocationBox(loc, roomDiv);
   });
