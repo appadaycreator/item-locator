@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>収納配置マップ - どこに置いたっけ？</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        body { background: #f5f7fa; }
+        .room { width: 300px; height: 200px; }
+        .location { width: 80px; height: 40px; }
+    </style>
+</head>
+<body class="p-6">
+    <header class="mb-6">
+        <a href="index.html" class="text-blue-600 hover:underline"><i class="fas fa-arrow-left mr-2"></i>戻る</a>
+        <h1 class="text-2xl font-bold mt-2">収納配置マップ</h1>
+    </header>
+    <div id="layout" class="flex flex-wrap gap-6"></div>
+    <script src="script.js"></script>
+    <script src="layout.js"></script>
+    <script src="header.js"></script>
+</body>
+</html>
