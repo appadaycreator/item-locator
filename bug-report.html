@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>不具合報告 - どこに置いたっけ？</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        h1 {
+            color: #4A90E2;
+            border-bottom: 3px solid #4A90E2;
+            padding-bottom: 10px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            margin-top: 20px;
+            background: #4A90E2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #357ABD;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #4A90E2;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid #4A90E2;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .back-link:hover {
+            background: #4A90E2;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>不具合報告</h1>
+        <p>アプリの不具合を発見した場合は、以下のフォームからご報告ください。</p>
+        <form id="bugForm">
+            <label>お名前
+                <input type="text" id="bugName" required>
+            </label>
+            <label>メールアドレス
+                <input type="email" id="bugEmail" required>
+            </label>
+            <label>不具合内容
+                <textarea id="bugMessage" rows="5" required></textarea>
+            </label>
+            <button type="submit">送信</button>
+        </form>
+        <p style="margin-top:20px;">または Twitter: <a href="https://twitter.com/appadaycreator" target="_blank">@appadaycreator</a> までご連絡ください。</p>
+        <a href="index.html" class="back-link">← サービスに戻る</a>
+    </div>
+    <script src="script.js"></script>
+    <script>
+      document.getElementById('bugForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('bugName').value;
+        const email = document.getElementById('bugEmail').value;
+        const message = document.getElementById('bugMessage').value;
+        const subject = encodeURIComponent('不具合報告');
+        const body = encodeURIComponent(`お名前: ${name}\nメール: ${email}\n\n${message}`);
+        window.location.href = `mailto:appadaycreator@example.com?subject=${subject}&body=${body}`;
+      });
+    </script>
+</body>
+</html>
