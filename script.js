@@ -472,12 +472,30 @@ function addLocation() {
 function editLocation(index) {
   const locations = loadLocations();
   const loc = locations[index];
+  const rooms = loadRooms();
+
+  let room = prompt('収納部屋', loc.room);
+  if (room === null) return;
+  room = room.trim();
+  if (!room) return;
+  if (!rooms.includes(room)) {
+    if (confirm(`${room} を新しい部屋として追加しますか？`)) {
+      rooms.push(room);
+      saveRooms(rooms);
+    } else {
+      return;
+    }
+  }
+
   const name = prompt('収納場所名', loc.name);
   if (name === null) return;
+
+  loc.room = room;
   loc.name = name.trim();
   saveLocations(locations);
   renderLocations();
-  updateLocationOptions(loc.room);
+  updateRoomOptions();
+  updateLocationOptions(room);
 }
 
 function deleteLocation(index) {
