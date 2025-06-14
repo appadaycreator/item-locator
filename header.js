@@ -24,6 +24,15 @@ async function loadCommonHeader() {
       menu.classList.toggle('show');
     });
   }
+
+  const backBtn = document.getElementById('backButton');
+  if (backBtn && !location.pathname.endsWith('index.html')) {
+    backBtn.style.display = 'inline';
+    backBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      history.back();
+    });
+  }
 }
 
 window.addEventListener('DOMContentLoaded', loadCommonHeader);

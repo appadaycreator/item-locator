@@ -22,9 +22,18 @@
       text-decoration: none;
       color: #333;
     }
+    #backButton {
+      display: none;
+      margin-right: 1rem;
+      text-decoration: none;
+      color: #333;
+    }
   </style>
   <div class="flex justify-between items-center">
-    <a href="index.html" class="text-blue-600 font-bold text-lg">どこに置いたっけ？</a>
+    <div class="flex items-center">
+      <a id="backButton" href="#">← 戻る</a>
+      <a href="index.html" class="text-blue-600 font-bold text-lg">どこに置いたっけ？</a>
+    </div>
     <div class="flex items-center">
       <button id="menuToggle" class="md:hidden text-gray-700 p-2">&#9776;</button>
       <div id="fontSize" class="hidden md:block"></div>
