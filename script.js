@@ -20,31 +20,45 @@ function saveFontSize(size) {
 }
 
 function initFontSizeControl() {
-  const select = document.createElement('select');
-  select.id = 'fontSizeSelect';
-  // Remove fixed positioning so the control is placed in normal flow
-  select.className = 'p-2 border rounded bg-white shadow text-sm text-black';
-  const options = [
-    { v: '20', l: '特大' },
-    { v: '18', l: '大' },
-    { v: '16', l: '標準' },
-    { v: '14', l: '小' },
-    { v: '12', l: '極小' }
-  ];
-  options.forEach(o => {
-    const opt = document.createElement('option');
-    opt.value = o.v;
-    opt.textContent = o.l;
-    select.appendChild(opt);
-  });
-  const container = document.querySelector('header') || document.body;
-  container.appendChild(select);
+  const containers = [];
+  const desktop = document.getElementById('desktopFontSize');
+  const mobile = document.getElementById('mobileFontSize');
+  if (desktop) containers.push(desktop);
+  if (mobile) containers.push(mobile);
+  if (containers.length === 0) {
+    const header = document.querySelector('header');
+    if (header) containers.push(header);
+  }
+
+  const selects = [];
   const size = loadFontSize();
   applyFontSize(size);
-  select.value = size;
-  select.addEventListener('change', e => {
-    applyFontSize(e.target.value);
-    saveFontSize(e.target.value);
+
+  containers.forEach(c => {
+    const select = document.createElement('select');
+    select.className = 'p-2 border rounded bg-white shadow text-sm text-black';
+    const options = [
+      { v: '20', l: '特大' },
+      { v: '18', l: '大' },
+      { v: '16', l: '標準' },
+      { v: '14', l: '小' },
+      { v: '12', l: '極小' }
+    ];
+    options.forEach(o => {
+      const opt = document.createElement('option');
+      opt.value = o.v;
+      opt.textContent = o.l;
+      select.appendChild(opt);
+    });
+    select.value = size;
+    select.addEventListener('change', e => {
+      const val = e.target.value;
+      applyFontSize(val);
+      saveFontSize(val);
+      selects.forEach(s => { if (s !== e.target) s.value = val; });
+    });
+    c.appendChild(select);
+    selects.push(select);
   });
 }
 

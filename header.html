@@ -1,3 +1,12 @@
-<header class="bg-gray-100 p-4 mb-6 flex justify-between items-center">
-  <a href="index.html" class="text-blue-600 font-bold text-lg">どこに置いたっけ？</a>
+<header class="bg-gray-100 p-4 mb-6">
+  <div class="flex justify-between items-center">
+    <a href="index.html" class="text-blue-600 font-bold text-lg">どこに置いたっけ？</a>
+    <div class="flex items-center gap-2">
+      <div id="desktopFontSize" class="hidden md:block"></div>
+      <button id="mobileMenuBtn" class="md:hidden px-2 text-2xl">&#9776;</button>
+    </div>
+  </div>
+  <div id="mobileMenu" class="md:hidden hidden mt-2">
+    <div id="mobileFontSize"></div>
+  </div>
 </header>
