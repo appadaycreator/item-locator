@@ -29,6 +29,21 @@ async function loadCommonHeader() {
     });
   }
 
+  const exportNav = document.getElementById('exportDataNav');
+  if (exportNav) exportNav.addEventListener('click', exportData);
+  const importNav = document.getElementById('importDataNav');
+  const importInputNav = document.getElementById('importDataInputNav');
+  if (importNav && importInputNav) {
+    importNav.addEventListener('click', (e) => {
+      e.preventDefault();
+      importInputNav.click();
+    });
+    importInputNav.addEventListener('change', (e) => {
+      if (e.target.files[0]) importData(e.target.files[0]);
+      importInputNav.value = '';
+    });
+  }
+
   const backBtn = document.getElementById('backButton');
   if (backBtn && !location.pathname.endsWith('index.html')) {
     backBtn.style.display = 'inline';

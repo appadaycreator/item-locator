@@ -682,4 +682,16 @@ window.addEventListener('DOMContentLoaded', () => {
       importInput.value = '';
     });
   }
+
+  const exportNav = document.getElementById('exportDataNav');
+  if (exportNav) exportNav.addEventListener('click', exportData);
+  const importNav = document.getElementById('importDataNav');
+  const importInputNav = document.getElementById('importDataInputNav');
+  if (importNav && importInputNav) {
+    importNav.addEventListener('click', () => importInputNav.click());
+    importInputNav.addEventListener('change', e => {
+      if (e.target.files[0]) importData(e.target.files[0]);
+      importInputNav.value = '';
+    });
+  }
 });

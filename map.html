@@ -12,14 +12,21 @@
 </head>
 <body class="p-6">
     <!-- ヘッダーは共通テンプレートから読み込み -->
-    <div id="floorPlan" class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6"></div>
-    <div id="mapContainer" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
+    <div class="mb-4 flex flex-col gap-2 sm:flex-row">
+        <select id="locationRoomSelect" class="p-2 border border-gray-300 rounded-lg">
+            <option>部屋を選択</option>
+        </select>
+        <input id="newLocationName" type="text" placeholder="収納場所名" class="p-2 border border-gray-300 rounded-lg flex-grow">
+        <button id="addLocationBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">追加</button>
+    </div>
+    <div id="layout" class="flex flex-wrap gap-6 mb-8"></div>
+    <div id="mapContainer" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8"></div>
     <script src="script.js"></script>
+    <script src="layout.js"></script>
     <script src="header.js"></script>
     <script>
         function renderMap() {
             const container = document.getElementById('mapContainer');
-            const floor = document.getElementById('floorPlan');
             const items = loadItems();
             if (items.length === 0) {
                 container.innerHTML = '<p class="text-gray-600">まだアイテムが登録されていません。</p>';
@@ -70,17 +77,6 @@
 
             const tree = buildTree(items);
 
-            floor.innerHTML = '';
-            Object.keys(tree).forEach(parent => {
-                const cell = document.createElement('div');
-                cell.className = 'flex flex-col items-center p-4 bg-white rounded-lg shadow cursor-pointer hover:bg-blue-50';
-                cell.innerHTML = `<i class="fas fa-box-open text-2xl mb-2"></i><span>${parent}</span>`;
-                cell.addEventListener('click', () => {
-                    const room = encodeURIComponent(parent);
-                    location.href = `layout.html?room=${room}`;
-                });
-                floor.appendChild(cell);
-            });
 
             container.innerHTML = '';
             renderTree(tree, container);
