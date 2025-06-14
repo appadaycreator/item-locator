@@ -12,15 +12,14 @@ function createLocationBox(loc, roomDiv) {
   box.style.top = loc.y + 'px';
   roomDiv.appendChild(box);
 
-  box.addEventListener('mousedown', e => {
-    e.preventDefault();
-    const startX = e.clientX;
-    const startY = e.clientY;
+  function startDrag(startX, startY, isTouch) {
     const origX = loc.x;
     const origY = loc.y;
     function onMove(ev) {
-      const dx = ev.clientX - startX;
-      const dy = ev.clientY - startY;
+      const clientX = isTouch ? ev.touches[0].clientX : ev.clientX;
+      const clientY = isTouch ? ev.touches[0].clientY : ev.clientY;
+      const dx = clientX - startX;
+      const dy = clientY - startY;
       let x = origX + dx;
       let y = origY + dy;
       x = Math.max(0, Math.min(roomDiv.clientWidth - box.offsetWidth, x));
@@ -31,12 +30,23 @@ function createLocationBox(loc, roomDiv) {
       loc.y = y;
     }
     function endMove() {
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup', endMove);
+      document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onMove);
+      document.removeEventListener(isTouch ? 'touchend' : 'mouseup', endMove);
       saveLayout();
     }
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', endMove);
+    document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onMove);
+    document.addEventListener(isTouch ? 'touchend' : 'mouseup', endMove);
+  }
+
+  box.addEventListener('mousedown', e => {
+    e.preventDefault();
+    startDrag(e.clientX, e.clientY, false);
+  });
+
+  box.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const t = e.touches[0];
+    startDrag(t.clientX, t.clientY, true);
   });
 }
 
