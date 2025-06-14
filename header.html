@@ -1,6 +1,39 @@
 <header class="bg-gray-100 p-4 mb-6">
+  <style>
+    #navMenu {
+      display: none;
+    }
+    #navMenu.show {
+      display: block;
+    }
+    @media (min-width: 768px) {
+      #navMenu {
+        display: flex !important;
+      }
+      #menuToggle {
+        display: none;
+      }
+    }
+    #menuToggle {
+      cursor: pointer;
+    }
+    #navMenu a {
+      margin-right: 1rem;
+      text-decoration: none;
+      color: #333;
+    }
+  </style>
   <div class="flex justify-between items-center">
     <a href="index.html" class="text-blue-600 font-bold text-lg">どこに置いたっけ？</a>
-    <div id="fontSize"></div>
+    <div class="flex items-center">
+      <button id="menuToggle" class="md:hidden text-gray-700 p-2">&#9776;</button>
+      <div id="fontSize" class="hidden md:block"></div>
+    </div>
   </div>
+  <nav id="navMenu" class="mt-2 md:mt-0 md:ml-4">
+    <a href="about.html">サービスについて</a>
+    <a href="guide.html">使い方ガイド</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html">お問い合わせ</a>
+  </nav>
 </header>
