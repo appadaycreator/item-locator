@@ -17,17 +17,6 @@ async function loadCommonHeader() {
     }
   }
   initFontSizeControl();
-  initMobileMenu();
-}
-
-function initMobileMenu() {
-  const btn = document.getElementById('mobileMenuBtn');
-  const menu = document.getElementById('mobileMenu');
-  if (btn && menu) {
-    btn.addEventListener('click', () => {
-      menu.classList.toggle('hidden');
-    });
-  }
 }
 
 window.addEventListener('DOMContentLoaded', loadCommonHeader);
