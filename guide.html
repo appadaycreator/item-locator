@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>使い方ガイド - どこに置いたっけ？</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -78,8 +79,8 @@
 
         <h2>4. データをバックアップする</h2>
         <ol>
-            <li>ブラウザのローカルストレージに保存されたデータは、設定からエクスポート可能です。</li>
-            <li>バックアップしたJSONファイルをインポートすると、別の端末でも同じデータを利用できます。</li>
+            <li>データはSupabaseに保存され、常に自動で同期されます。</li>
+            <li>JSONファイルでのバックアップも可能です。</li>
         </ol>
 
     <a href="index.html" class="back-link">← サービスに戻る</a>

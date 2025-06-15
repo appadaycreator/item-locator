@@ -128,7 +128,7 @@ Made with ❤️ by AppADayCreator
 - メモ内容での検索
 
 ### 3. データ管理
-- ローカルストレージでのデータ保存
+- Supabaseでのデータ保存
 - オフライン対応
 - データのエクスポート/インポート機能
 
@@ -160,7 +160,7 @@ Made with ❤️ by AppADayCreator
 - JavaScript (ES6+)
   - モジュールパターン
   - 非同期処理
-  - ローカルストレージAPI
+  - Supabase JavaScript API
 
 ### PWA機能
 - Service Worker
@@ -254,8 +254,7 @@ GitHub Pagesを使用してデプロイします：
 
 詳細な内容は[プライバシーポリシー](privacy.html)をご覧ください。
 
-- すべてのデータはローカルストレージに保存
-- 外部サーバーへのデータ送信なし
+- データはSupabaseに保存され、複数端末で共有可能
 - アクセス解析のみGoogle Analyticsを使用
 
 ## 免責事項
