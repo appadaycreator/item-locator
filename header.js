@@ -23,9 +23,33 @@ async function loadCommonHeader() {
   }
   const toggle = document.getElementById('menuToggle');
   const menu = document.getElementById('navMenu');
+  const overlay = document.getElementById('menuOverlay');
+  const closeBtn = document.getElementById('closeMenu');
+
+  function closeMenu() {
+    if (menu) menu.classList.remove('show');
+    if (overlay) overlay.classList.remove('show');
+  }
+
   if (toggle && menu) {
     toggle.addEventListener('click', () => {
       menu.classList.toggle('show');
+      if (overlay) overlay.classList.toggle('show');
+    });
+  }
+
+  if (overlay) {
+    overlay.addEventListener('click', closeMenu);
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeMenu);
+  }
+
+  if (menu) {
+    const links = menu.querySelectorAll('a[href]');
+    links.forEach(link => {
+      link.addEventListener('click', closeMenu);
     });
   }
 
