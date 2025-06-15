@@ -3,7 +3,7 @@ const ROOM_KEY = 'rooms';
 const LOCATION_KEY = 'locations';
 
 // Supabase設定 - ご自身のURLとAnonキーに置き換えてください
-const SUPABASE_URL = 'https://YOUR_SUPABASE_URL';
+const SUPABASE_URL = 'https://ynyudoqluixtptyimbfv.supabase.co';
 const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
 let supabaseClient = null;
 if (window.supabase) {
