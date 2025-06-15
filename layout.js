@@ -63,10 +63,15 @@ function createLocationBox(loc, roomDiv) {
 
 function initLayout(selectedRoom) {
   const params = new URLSearchParams(location.search);
-  const filterRoom = selectedRoom !== undefined ? selectedRoom : params.get('room');
+  let filterRoom = selectedRoom !== undefined ? selectedRoom : params.get('room');
 
   const container = document.getElementById('layout');
   const rooms = loadRooms();
+  if (!filterRoom && rooms.length) {
+    filterRoom = rooms[0];
+    const roomSelect = document.getElementById('layoutRoomSelect');
+    if (roomSelect && !roomSelect.value) roomSelect.value = filterRoom;
+  }
   const locations = loadLocations();
   rooms.sort((a, b) => {
     const hasA = locations.some(l => l.room === a);
