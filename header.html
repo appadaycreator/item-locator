@@ -2,13 +2,36 @@
   <style>
     #navMenu {
       display: none;
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 70%;
+      max-width: 200px;
+      height: 100%;
+      background: #fff;
+      padding: 1rem;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
     }
     #navMenu.show {
       display: block;
+      transform: translateX(0);
     }
     @media (min-width: 768px) {
       #navMenu {
+        position: static;
+        height: auto;
+        width: auto;
+        max-width: none;
+        transform: none;
+        box-shadow: none;
+        padding: 0;
         display: flex !important;
+      }
+      #navMenu a {
+        display: inline;
+        margin-bottom: 0;
       }
       #menuToggle {
         display: none;
@@ -18,7 +41,9 @@
       cursor: pointer;
     }
     #navMenu a {
+      display: block;
       margin-right: 1rem;
+      margin-bottom: 0.5rem;
       text-decoration: none;
       color: #333;
     }
