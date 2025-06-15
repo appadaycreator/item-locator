@@ -19,7 +19,11 @@ async function loadCommonHeader() {
   initFontSizeControl();
   const headerElem = document.querySelector('header');
   if (headerElem) {
-    document.body.style.paddingTop = headerElem.offsetHeight + 'px';
+    const adjustPadding = () => {
+      document.body.style.paddingTop = headerElem.offsetHeight + 'px';
+    };
+    adjustPadding();
+    window.addEventListener('resize', adjustPadding);
   }
   const toggle = document.getElementById('menuToggle');
   const menu = document.getElementById('navMenu');
