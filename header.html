@@ -13,6 +13,14 @@
       box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
       transform: translateX(100%);
       transition: transform 0.3s ease;
+      z-index: 60;
+    }
+    #menuOverlay {
+      display: none;
+      z-index: 50;
+    }
+    #menuOverlay.show {
+      display: block;
     }
     #navMenu.show {
       display: block;
@@ -58,6 +66,9 @@
       color: #1e40af;
       font-weight: bold;
     }
+    #closeMenu {
+      font-size: 1.25rem;
+    }
     #backButton {
       display: none;
       margin-right: 1rem;
@@ -76,6 +87,7 @@
     </div>
   </div>
   <nav id="navMenu" class="mt-2 md:mt-0 md:ml-4">
+    <button id="closeMenu" class="md:hidden absolute top-2 right-2 p-2">&times;</button>
     <a href="about.html" class="nav-link"><i class="fas fa-info-circle mr-2"></i>サービスについて</a>
     <a href="guide.html" class="nav-link"><i class="fas fa-book mr-2"></i>使い方ガイド</a>
     <a href="faq.html" class="nav-link"><i class="fas fa-question-circle mr-2"></i>FAQ</a>
@@ -84,4 +96,5 @@
     <a href="#" id="importDataNav" class="nav-link"><i class="fas fa-file-import mr-2"></i>データインポート</a>
     <input type="file" id="importDataInputNav" accept="application/json" class="hidden">
   </nav>
+  <div id="menuOverlay" class="md:hidden fixed inset-0 bg-black bg-opacity-50"></div>
 </header>
