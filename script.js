@@ -8,6 +8,7 @@ let editingLocationIndex = null;
 
 const FONT_SIZE_KEY = 'fontSize';
 const DEFAULT_FONT_SIZE = '16';
+const DEFAULT_ROOM = '書斎';
 
 function applyFontSize(size) {
   document.documentElement.style.fontSize = size + 'px';
@@ -65,7 +66,7 @@ function initFontSizeControl() {
 function loadRooms() {
   const data = localStorage.getItem(ROOM_KEY);
   if (data) return JSON.parse(data);
-  const defaults = ['リビング', '寝室', 'キッチン', '書斎'];
+  const defaults = [DEFAULT_ROOM, 'リビング', '寝室', 'キッチン'];
   localStorage.setItem(ROOM_KEY, JSON.stringify(defaults));
   return defaults;
 }
@@ -98,6 +99,9 @@ function updateRoomOptions() {
   selects.forEach(select => {
     select.innerHTML = '<option>選択してください</option>' +
       rooms.map(r => `<option>${r}</option>`).join('');
+    if (rooms.includes(DEFAULT_ROOM)) {
+      select.value = DEFAULT_ROOM;
+    }
   });
 }
 
@@ -348,6 +352,8 @@ function saveItem() {
   if (pathInput) pathInput.value = '';
   document.getElementById('itemMemo').value = '';
   document.getElementById('favorite').checked = false;
+  const roomSelect = document.getElementById('roomSelect');
+  if (roomSelect) roomSelect.value = DEFAULT_ROOM;
   photoData = '';
   const preview = document.getElementById('photoPreview');
   if (preview) {
@@ -501,7 +507,7 @@ function addLocation() {
   locations.push({ room, name, w: 60, h: 60 });
   saveLocations(locations);
   input.value = '';
-  if (roomSelect) roomSelect.selectedIndex = 0;
+  if (roomSelect) roomSelect.value = DEFAULT_ROOM;
   renderLocations();
   updateLocationOptions(room);
 }
