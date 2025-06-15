@@ -8,9 +8,88 @@ function createLocationBox(loc, roomDiv) {
   box.textContent = loc.name;
   loc.x = loc.x || 10;
   loc.y = loc.y || 10;
+  loc.w = loc.w || 60;
+  loc.h = loc.h || 60;
   box.style.left = loc.x + 'px';
   box.style.top = loc.y + 'px';
+  box.style.width = loc.w + 'px';
+  box.style.height = loc.h + 'px';
   roomDiv.appendChild(box);
+
+  const handle = document.createElement('div');
+  handle.className = 'resize-handle bg-blue-500 absolute bottom-0 right-0';
+  box.appendChild(handle);
+
+  function startResize(startX, startY, isTouch) {
+    const origW = loc.w;
+    const origH = loc.h;
+    function onMove(ev) {
+      const clientX = isTouch ? ev.touches[0].clientX : ev.clientX;
+      const clientY = isTouch ? ev.touches[0].clientY : ev.clientY;
+      const dx = clientX - startX;
+      const dy = clientY - startY;
+      let w = Math.max(20, origW + dx);
+      let h = Math.max(20, origH + dy);
+      w = Math.min(roomDiv.clientWidth - loc.x, w);
+      h = Math.min(roomDiv.clientHeight - loc.y, h);
+      box.style.width = w + 'px';
+      box.style.height = h + 'px';
+      loc.w = w;
+      loc.h = h;
+    }
+    function endResize() {
+      document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onMove);
+      document.removeEventListener(isTouch ? 'touchend' : 'mouseup', endResize);
+      saveLayout();
+    }
+    document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onMove, { passive: false });
+    document.addEventListener(isTouch ? 'touchend' : 'mouseup', endResize);
+  }
+
+  handle.addEventListener('mousedown', e => {
+    e.stopPropagation();
+    e.preventDefault();
+    startResize(e.clientX, e.clientY, false);
+  });
+
+  handle.addEventListener('touchstart', e => {
+    e.stopPropagation();
+    e.preventDefault();
+    const t = e.touches[0];
+    startResize(t.clientX, t.clientY, true);
+  });
+
+  function startPinch(e) {
+    if (e.touches.length !== 2) return;
+    e.preventDefault();
+    const t1 = e.touches[0];
+    const t2 = e.touches[1];
+    const startDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+    const origW = loc.w;
+    const origH = loc.h;
+    function onMove(ev) {
+      if (ev.touches.length !== 2) return;
+      const n1 = ev.touches[0];
+      const n2 = ev.touches[1];
+      const dist = Math.hypot(n1.clientX - n2.clientX, n1.clientY - n2.clientY);
+      const scale = dist / startDist;
+      let w = Math.max(20, origW * scale);
+      let h = Math.max(20, origH * scale);
+      w = Math.min(roomDiv.clientWidth - loc.x, w);
+      h = Math.min(roomDiv.clientHeight - loc.y, h);
+      box.style.width = w + 'px';
+      box.style.height = h + 'px';
+      loc.w = w;
+      loc.h = h;
+    }
+    function endPinch() {
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', endPinch);
+      saveLayout();
+    }
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', endPinch);
+  }
 
   let moved = false;
   function startDrag(startX, startY, isTouch) {
@@ -47,10 +126,14 @@ function createLocationBox(loc, roomDiv) {
   });
 
   box.addEventListener('touchstart', e => {
-    e.preventDefault();
-    const t = e.touches[0];
-    moved = false;
-    startDrag(t.clientX, t.clientY, true);
+    if (e.touches.length === 2) {
+      startPinch(e);
+    } else {
+      e.preventDefault();
+      const t = e.touches[0];
+      moved = false;
+      startDrag(t.clientX, t.clientY, true);
+    }
   });
 
   box.addEventListener('click', () => {
