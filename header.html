@@ -30,8 +30,9 @@
         display: flex !important;
       }
       #navMenu a {
-        display: inline;
+        margin-right: 1rem;
         margin-bottom: 0;
+        padding: 0.25rem 0.5rem;
       }
       #menuToggle {
         display: none;
@@ -41,11 +42,21 @@
       cursor: pointer;
     }
     #navMenu a {
-      display: block;
-      margin-right: 1rem;
+      display: flex;
+      align-items: center;
       margin-bottom: 0.5rem;
+      padding: 0.5rem;
       text-decoration: none;
       color: #333;
+      border-radius: 0.375rem;
+    }
+    #navMenu a:hover {
+      background: #edf2f7;
+    }
+    #navMenu a.active {
+      background: #bfdbfe;
+      color: #1e40af;
+      font-weight: bold;
     }
     #backButton {
       display: none;
@@ -65,12 +76,12 @@
     </div>
   </div>
   <nav id="navMenu" class="mt-2 md:mt-0 md:ml-4">
-    <a href="about.html">サービスについて</a>
-    <a href="guide.html">使い方ガイド</a>
-    <a href="faq.html">FAQ</a>
-    <a href="contact.html">お問い合わせ</a>
-    <a href="#" id="exportDataNav">データエクスポート</a>
-    <a href="#" id="importDataNav">データインポート</a>
+    <a href="about.html" class="nav-link"><i class="fas fa-info-circle mr-2"></i>サービスについて</a>
+    <a href="guide.html" class="nav-link"><i class="fas fa-book mr-2"></i>使い方ガイド</a>
+    <a href="faq.html" class="nav-link"><i class="fas fa-question-circle mr-2"></i>FAQ</a>
+    <a href="contact.html" class="nav-link"><i class="fas fa-envelope mr-2"></i>お問い合わせ</a>
+    <a href="#" id="exportDataNav" class="nav-link"><i class="fas fa-file-export mr-2"></i>データエクスポート</a>
+    <a href="#" id="importDataNav" class="nav-link"><i class="fas fa-file-import mr-2"></i>データインポート</a>
     <input type="file" id="importDataInputNav" accept="application/json" class="hidden">
   </nav>
 </header>
