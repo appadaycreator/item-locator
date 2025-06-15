@@ -44,6 +44,17 @@ async function loadCommonHeader() {
     });
   }
 
+  if (menu) {
+    const current = location.pathname.split('/').pop();
+    const links = menu.querySelectorAll('a[href]');
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && href !== '#' && current === href) {
+        link.classList.add('active');
+      }
+    });
+  }
+
   const backBtn = document.getElementById('backButton');
   if (backBtn && !location.pathname.endsWith('index.html')) {
     backBtn.style.display = 'inline';
