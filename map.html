@@ -20,8 +20,17 @@
         #layout .location {
             width: 60px;
             height: 60px;
-            line-height: 60px;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+        }
+        .resize-handle {
+            width: 12px;
+            height: 12px;
+            cursor: se-resize;
+            border-radius: 2px;
+            background-color: rgba(59,130,246,0.8);
         }
     </style>
 </head>

@@ -498,7 +498,7 @@ function addLocation() {
   if (!name) return alert('収納場所名を入力してください');
   if (!room) return alert('部屋を選択してください');
   const locations = loadLocations();
-  locations.push({ room, name });
+  locations.push({ room, name, w: 60, h: 60 });
   saveLocations(locations);
   input.value = '';
   if (roomSelect) roomSelect.selectedIndex = 0;
