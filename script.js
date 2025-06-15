@@ -4,7 +4,7 @@ const LOCATION_KEY = 'locations';
 
 // Supabase設定 - ご自身のURLとAnonキーに置き換えてください
 const SUPABASE_URL = 'https://ynyudoqluixtptyimbfv.supabase.co';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlueXVkb3FsdWl4dHB0eWltYmZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5ODExNDUsImV4cCI6MjA2NTU1NzE0NX0.0qmfy-UXpLQ-q2h69lFLAArPlz5A6NJXo2_7rvDz3Jc';
 let supabaseClient = null;
 if (window.supabase) {
   supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
