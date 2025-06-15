@@ -2,6 +2,47 @@ const ITEM_KEY = 'items';
 const ROOM_KEY = 'rooms';
 const LOCATION_KEY = 'locations';
 
+// Supabase設定 - ご自身のURLとAnonキーに置き換えてください
+const SUPABASE_URL = 'https://YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+let supabaseClient = null;
+if (window.supabase) {
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}
+
+async function syncFromSupabase() {
+  if (!supabaseClient) return;
+  try {
+    const { data, error } = await supabaseClient
+      .from('appdata')
+      .select('payload')
+      .eq('id', 1)
+      .single();
+    if (!error && data && data.payload) {
+      const { items, rooms, locations } = data.payload;
+      if (items) localStorage.setItem(ITEM_KEY, JSON.stringify(items));
+      if (rooms) localStorage.setItem(ROOM_KEY, JSON.stringify(rooms));
+      if (locations) localStorage.setItem(LOCATION_KEY, JSON.stringify(locations));
+    }
+  } catch (e) {
+    console.error('Supabaseからの読み込みに失敗しました', e);
+  }
+}
+
+async function syncToSupabase() {
+  if (!supabaseClient) return;
+  const payload = {
+    items: JSON.parse(localStorage.getItem(ITEM_KEY) || '[]'),
+    rooms: JSON.parse(localStorage.getItem(ROOM_KEY) || '[]'),
+    locations: JSON.parse(localStorage.getItem(LOCATION_KEY) || '[]')
+  };
+  try {
+    await supabaseClient.from('appdata').upsert({ id: 1, payload });
+  } catch (e) {
+    console.error('Supabaseへの保存に失敗しました', e);
+  }
+}
+
 let photoData = '';
 let editingItemId = null;
 let editingLocationIndex = null;
@@ -73,6 +114,7 @@ function loadRooms() {
 
 function saveRooms(rooms) {
   localStorage.setItem(ROOM_KEY, JSON.stringify(rooms));
+  syncToSupabase();
 }
 
 function loadLocations() {
@@ -85,6 +127,7 @@ function loadLocations() {
 
 function saveLocations(locations) {
   localStorage.setItem(LOCATION_KEY, JSON.stringify(locations));
+  syncToSupabase();
 }
 
 function updateRoomOptions() {
@@ -137,6 +180,7 @@ function loadItems() {
 
 function saveItems(items) {
   localStorage.setItem(ITEM_KEY, JSON.stringify(items));
+  syncToSupabase();
 }
 
 function updateDashboard() {
@@ -579,7 +623,8 @@ function deleteLocation(index) {
   updateLocationOptions(loc.room);
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
+  await syncFromSupabase();
   applyFontSize(loadFontSize());
   updateDashboard();
   updateRoomOptions();

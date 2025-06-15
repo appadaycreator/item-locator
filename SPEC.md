@@ -6,7 +6,7 @@
 - フロントエンドのみのSPA（Single Page Application）
 - PWA（Progressive Web App）対応
 - オフライン対応
-- ローカルストレージベースのデータ管理
+- Supabaseを利用したデータ管理
 
 ### 1.2 技術スタック
 - HTML5
@@ -14,7 +14,7 @@
 - JavaScript (ES6+)
 - Service Worker
 - Web App Manifest
-- Local Storage API
+- Supabase JavaScript API
 
 ## 2. 機能詳細仕様
 
@@ -70,7 +70,7 @@
 
 ### 2.3 データ管理
 
-#### 2.3.1 ローカルストレージ構造
+#### 2.3.1 Supabase保存構造
 ```javascript
 {
   'locations': {
@@ -164,14 +164,14 @@
 - Largest Contentful Paint: 2.5秒以内
 
 ### 5.2 メモリ使用量
-- ローカルストレージ：5MB以内
+- Supabase側ストレージ：5MB以内
 - メモリリーク対策
 - ガベージコレクション最適化
 
 ## 6. セキュリティ要件
 
 ### 6.1 データ保護
-- ローカルストレージの暗号化
+- Supabaseデータの暗号化
 - XSS対策
 - CSRF対策
 

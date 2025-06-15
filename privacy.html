@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>プライバシーポリシー - どこに置いたっけ？</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -87,11 +88,10 @@
         </ul>
         
         <h2>4. データの保存</h2>
-        <p><strong>重要：</strong> 当サービスは、すべてのデータをお使いの端末のローカルストレージ（ブラウザ内）に保存します。当社のサーバーには一切のデータを送信・保存しません。</p>
+        <p><strong>重要：</strong> 当サービスは、データをSupabaseに保存し、ユーザーは複数の端末から同じ情報を利用できます。</p>
         <ul>
-            <li>データはブラウザのLocalStorage APIを使用して保存されます</li>
-            <li>データの削除はブラウザの設定から行えます</li>
-            <li>端末を変更した場合、データは引き継がれません</li>
+            <li>インターネット接続時に自動で同期されます</li>
+            <li>エクスポート機能でローカルにバックアップも可能です</li>
         </ul>
         
         <h2>5. 第三者サービス</h2>
