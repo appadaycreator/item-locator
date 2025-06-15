@@ -90,7 +90,8 @@ function updateRoomOptions() {
   const selects = [
     document.getElementById('roomSelect'),
     document.getElementById('locationRoomSelect'),
-    document.getElementById('editLocationRoom')
+    document.getElementById('editLocationRoom'),
+    document.getElementById('layoutRoomSelect')
   ].filter(Boolean);
   if (selects.length === 0) return;
   const rooms = loadRooms();
@@ -580,6 +581,11 @@ window.addEventListener('DOMContentLoaded', () => {
   updateLocationOptions(roomSelect ? roomSelect.value : '');
   renderLocations();
   renderRooms();
+  const layoutRoomSelect = document.getElementById('layoutRoomSelect');
+  if (layoutRoomSelect) {
+    const rooms = loadRooms();
+    if (rooms.length) layoutRoomSelect.value = rooms[0];
+  }
   const addRoomBtn = document.getElementById('addRoomBtn');
   if (addRoomBtn) addRoomBtn.addEventListener('click', addRoom);
   if (roomSelect) roomSelect.addEventListener('change', e => updateLocationOptions(e.target.value));

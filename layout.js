@@ -61,9 +61,9 @@ function createLocationBox(loc, roomDiv) {
   });
 }
 
-function initLayout() {
+function initLayout(selectedRoom) {
   const params = new URLSearchParams(location.search);
-  const filterRoom = params.get('room');
+  const filterRoom = selectedRoom !== undefined ? selectedRoom : params.get('room');
 
   const container = document.getElementById('layout');
   const rooms = loadRooms();
@@ -101,7 +101,15 @@ function initLayout() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  initLayout();
+  const roomSelect = document.getElementById('layoutRoomSelect');
+  if (roomSelect) {
+    initLayout(roomSelect.value || null);
+    roomSelect.addEventListener('change', e => initLayout(e.target.value || null));
+  } else {
+    initLayout();
+  }
   const btn = document.getElementById('addLocationBtn');
-  if (btn) btn.addEventListener('click', () => setTimeout(initLayout, 0));
+  if (btn) btn.addEventListener('click', () => setTimeout(() => {
+    initLayout(roomSelect ? roomSelect.value || null : undefined);
+  }, 0));
 });
