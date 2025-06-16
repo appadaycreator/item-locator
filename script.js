@@ -783,4 +783,6 @@ window.addEventListener('DOMContentLoaded', async () => {
       importInputNav.value = '';
     });
   }
+  const syncNav = document.getElementById('syncSupabaseNav');
+  if (syncNav) syncNav.addEventListener('click', syncToSupabase);
 });

@@ -71,6 +71,11 @@ async function loadCommonHeader() {
       importInputNav.value = '';
     });
   }
+  const syncNav = document.getElementById('syncSupabaseNav');
+  if (syncNav) syncNav.addEventListener('click', (e) => {
+    e.preventDefault();
+    syncToSupabase();
+  });
 
   if (menu) {
     const current = location.pathname.split('/').pop();
