@@ -162,6 +162,7 @@ function initLayout(selectedRoom) {
     if (hasA === hasB) return 0;
     return hasA ? -1 : 1;
   });
+  const roomSizes = loadRoomSizes ? loadRoomSizes() : {};
   window.layoutLocations = locations;
   container.innerHTML = '';
   rooms.forEach(room => {
@@ -169,6 +170,9 @@ function initLayout(selectedRoom) {
     const hasLoc = locations.some(l => l.room === room);
     const div = document.createElement('div');
     div.dataset.room = room;
+    const size = roomSizes[room] || { w: 240, h: 240 };
+    div.style.width = size.w + 'px';
+    div.style.height = size.h + 'px';
     if (hasLoc) {
       div.className = 'room border border-gray-300 bg-white rounded relative';
       const title = document.createElement('div');
@@ -179,6 +183,45 @@ function initLayout(selectedRoom) {
       div.className = 'room empty border border-gray-300 bg-white rounded text-sm';
       div.textContent = room;
     }
+    const handle = document.createElement('div');
+    handle.className = 'resize-handle room-resize absolute bottom-0 right-0';
+    div.appendChild(handle);
+
+    function startResize(startX, startY, isTouch) {
+      const origW = size.w;
+      const origH = size.h;
+      function onMove(ev) {
+        const clientX = isTouch ? ev.touches[0].clientX : ev.clientX;
+        const clientY = isTouch ? ev.touches[0].clientY : ev.clientY;
+        const dx = clientX - startX;
+        const dy = clientY - startY;
+        let w = Math.max(120, origW + dx);
+        let h = Math.max(120, origH + dy);
+        div.style.width = w + 'px';
+        div.style.height = h + 'px';
+        roomSizes[room] = { w, h };
+      }
+      function endResize() {
+        document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onMove);
+        document.removeEventListener(isTouch ? 'touchend' : 'mouseup', endResize);
+        if (typeof saveRoomSizes === 'function') saveRoomSizes(roomSizes);
+      }
+      document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onMove, { passive: false });
+      document.addEventListener(isTouch ? 'touchend' : 'mouseup', endResize);
+    }
+
+    handle.addEventListener('mousedown', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      startResize(e.clientX, e.clientY, false);
+    });
+    handle.addEventListener('touchstart', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      const t = e.touches[0];
+      startResize(t.clientX, t.clientY, true);
+    });
+
     container.appendChild(div);
   });
   locations.forEach(loc => {
