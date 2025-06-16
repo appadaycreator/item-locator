@@ -1,6 +1,7 @@
 const ITEM_KEY = 'items';
 const ROOM_KEY = 'rooms';
 const LOCATION_KEY = 'locations';
+const ROOM_SIZE_KEY = 'roomSizes';
 
 // Supabase設定 - ご自身のURLとAnonキーに置き換えてください
 const SUPABASE_URL = 'https://ynyudoqluixtptyimbfv.supabase.co';
@@ -19,10 +20,11 @@ async function syncFromSupabase() {
       .eq('id', 1)
       .single();
     if (!error && data && data.payload) {
-      const { items, rooms, locations } = data.payload;
+      const { items, rooms, locations, roomSizes } = data.payload;
       if (items) localStorage.setItem(ITEM_KEY, JSON.stringify(items));
       if (rooms) localStorage.setItem(ROOM_KEY, JSON.stringify(rooms));
       if (locations) localStorage.setItem(LOCATION_KEY, JSON.stringify(locations));
+      if (roomSizes) localStorage.setItem(ROOM_SIZE_KEY, JSON.stringify(roomSizes));
     }
   } catch (e) {
     console.error('Supabaseからの読み込みに失敗しました', e);
@@ -34,7 +36,8 @@ async function syncToSupabase() {
   const payload = {
     items: JSON.parse(localStorage.getItem(ITEM_KEY) || '[]'),
     rooms: JSON.parse(localStorage.getItem(ROOM_KEY) || '[]'),
-    locations: JSON.parse(localStorage.getItem(LOCATION_KEY) || '[]')
+    locations: JSON.parse(localStorage.getItem(LOCATION_KEY) || '[]'),
+    roomSizes: JSON.parse(localStorage.getItem(ROOM_SIZE_KEY) || '{}')
   };
   try {
     await supabaseClient.from('appdata').upsert({ id: 1, payload });
@@ -127,6 +130,21 @@ function loadLocations() {
 
 function saveLocations(locations) {
   localStorage.setItem(LOCATION_KEY, JSON.stringify(locations));
+  syncToSupabase();
+}
+
+function loadRoomSizes() {
+  const data = localStorage.getItem(ROOM_SIZE_KEY);
+  if (data) return JSON.parse(data);
+  const rooms = loadRooms();
+  const defaults = {};
+  rooms.forEach(r => { defaults[r] = { w: 240, h: 240 }; });
+  localStorage.setItem(ROOM_SIZE_KEY, JSON.stringify(defaults));
+  return defaults;
+}
+
+function saveRoomSizes(sizes) {
+  localStorage.setItem(ROOM_SIZE_KEY, JSON.stringify(sizes));
   syncToSupabase();
 }
 
@@ -483,6 +501,9 @@ function addRoom() {
   if (!name) return alert('部屋名を入力してください');
   const rooms = loadRooms();
   rooms.push(name);
+  const sizes = loadRoomSizes();
+  sizes[name] = { w: 240, h: 240 };
+  saveRoomSizes(sizes);
   saveRooms(rooms);
   input.value = '';
   renderRooms();
@@ -494,7 +515,15 @@ function editRoom(index) {
   const rooms = loadRooms();
   const name = prompt('部屋名', rooms[index]);
   if (name === null) return;
-  rooms[index] = name.trim();
+  const newName = name.trim();
+  const oldName = rooms[index];
+  rooms[index] = newName;
+  const sizes = loadRoomSizes();
+  if (sizes[oldName]) {
+    sizes[newName] = sizes[oldName];
+    delete sizes[oldName];
+    saveRoomSizes(sizes);
+  }
   saveRooms(rooms);
   renderRooms();
   updateRoomOptions();
@@ -504,7 +533,10 @@ function editRoom(index) {
 function deleteRoom(index) {
   if (!confirm('この部屋を削除しますか？')) return;
   const rooms = loadRooms();
-  rooms.splice(index, 1);
+  const removed = rooms.splice(index, 1)[0];
+  const sizes = loadRoomSizes();
+  delete sizes[removed];
+  saveRoomSizes(sizes);
   saveRooms(rooms);
   renderRooms();
   updateRoomOptions();
